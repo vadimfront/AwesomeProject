@@ -20,7 +20,7 @@ export const RegistrationForm = () => {
         >
           {({ handleChange, handleSubmit, values }) => (
             <View style={styles.fromContent}>
-              <InputPassword
+              <InputCustom
                 inputName="login"
                 inputMode="text"
                 values={values}

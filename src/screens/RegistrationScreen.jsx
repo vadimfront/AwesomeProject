@@ -12,15 +12,15 @@ import { RegistrationForm } from "../components/RegistrationForm";
 export const RegistrationScreen = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ImageBackground style={styles.image} source={bg}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS == "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={-170}
-          style={styles.container}
-        >
+      <KeyboardAvoidingView
+        behavior={Platform.OS == "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={-170}
+        style={styles.container}
+      >
+        <ImageBackground style={styles.image} source={bg}>
           <RegistrationForm />
-        </KeyboardAvoidingView>
-      </ImageBackground>
+        </ImageBackground>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 };
@@ -28,9 +28,9 @@ export const RegistrationScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-end",
   },
   image: {
     flex: 1,
+    justifyContent: "flex-end",
   },
 });
