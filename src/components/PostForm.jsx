@@ -1,22 +1,10 @@
 import { Formik } from "formik";
 import React from "react";
-import {
-  Button,
-  Keyboard,
-  KeyboardAvoidingView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { StyleSheet, View } from "react-native";
 import { colors } from "../constants/colors";
-import { CameraComponent } from "./Camera";
 import { ButtonCustom } from "./ButtonCustom";
 import { ButtonIcon } from "./ButtonIcon";
 import { InputCustom } from "./InputCustom";
-import { SafeAreaView } from "react-native-safe-area-context";
-import KeyboardAvoidingContainer from "./KeyboardAvoidingContainer";
 
 export const PostForm = () => {
   return (

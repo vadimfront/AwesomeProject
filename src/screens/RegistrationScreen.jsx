@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  ImageBackground,
-  Keyboard,
-  KeyboardAvoidingView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-} from "react-native";
+import { ImageBackground, StyleSheet } from "react-native";
 import bg from "../assets/images/RegistrationScreenBg.jpg";
 import { RegistrationForm } from "../components/RegistrationForm";
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";

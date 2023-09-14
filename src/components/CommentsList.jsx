@@ -4,8 +4,6 @@ import { Image, Text, View } from "react-native";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/fonts";
 import { FlatList } from "react-native";
-import { Dimensions } from "react-native";
-import { Keyboard } from "react-native";
 
 export const CommentsList = ({ commentsData }) => {
   return (

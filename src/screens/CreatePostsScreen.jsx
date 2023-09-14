@@ -1,15 +1,6 @@
 import React from "react";
 import { PostForm } from "../components/PostForm";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
-import { colors } from "../constants/colors";
+import { ScrollView, StyleSheet, View } from "react-native";
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
 
 export const CreatePostsScreen = () => {

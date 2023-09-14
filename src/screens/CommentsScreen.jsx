@@ -1,20 +1,11 @@
 import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
 import { postData } from "../constants/temporary";
-import {
-  Animated,
-  Image,
-  Keyboard,
-  SafeAreaView,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 
 import { CommentsList } from "../components/CommentsList";
 import { CommentForm } from "../components/CommentForm";
 
-import { KeyboardAvoidingView } from "react-native";
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
 
 export const CommentsScreen = () => {

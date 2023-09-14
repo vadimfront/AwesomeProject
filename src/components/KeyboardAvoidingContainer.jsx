@@ -1,9 +1,7 @@
 import React from "react";
 import {
   KeyboardAvoidingView,
-  SafeAreaView,
   Platform,
-  ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
