@@ -1,14 +1,16 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 import { Formik } from "formik";
-import { fontSizes } from "../constants/FontSizes";
+import { fontSizes } from "../constants/fontSizes";
 import { UserAvatar } from "./UserAvatar";
 import { ButtonCustom } from "./ButtonCustom";
 import { InputPassword } from "./InputPassword";
 import { InputCustom } from "./InputCustom";
 
 export const RegistrationForm = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.form}>
       <UserAvatar />
@@ -16,14 +18,17 @@ export const RegistrationForm = () => {
       <View style={styles.container}>
         <Formik
           initialValues={{ login: "", email: "", password: "" }}
-          onSubmit={(value) => console.log(value)}
+          onSubmit={(value) => {
+            console.log(value);
+            navigation.navigate("Home");
+          }}
         >
           {({ handleChange, handleSubmit, values }) => (
             <View style={styles.fromContent}>
               <InputCustom
                 inputName="login"
                 inputMode="text"
-                values={values}
+                value={values}
                 handleChange={handleChange}
                 placeholder="Логін"
               />
@@ -31,21 +36,23 @@ export const RegistrationForm = () => {
                 inputName="email"
                 autoCapitalize="none"
                 inputMode="email"
-                values={values}
+                value={values}
                 handleChange={handleChange}
                 placeholder="Адреса електронної пошти"
               />
               <InputPassword
                 inputName="password"
                 handleChange={handleChange}
-                values={values}
+                value={values}
                 placeholder="Пароль"
               />
               <ButtonCustom onPress={handleSubmit}>Зареєстуватися</ButtonCustom>
             </View>
           )}
         </Formik>
-        <Text style={styles.linkSignup}>Вже є акаунт? Увійти</Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <Text style={styles.linkSignup}>Вже є акаунт? Увійти</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -64,7 +71,7 @@ const styles = StyleSheet.create({
     marginVertical: 32,
     fontSize: fontSizes.titleFirstLevel,
     textAlign: "center",
-    color: colors.title,
+    color: colors.baseTextColor,
     fontFamily: "Roboto-Medium",
   },
   fromContent: {

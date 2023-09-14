@@ -8,20 +8,15 @@ import {
 } from "react-native";
 import { LoginForm } from "../components/LoginForm";
 import bg from "../assets/images/RegistrationScreenBg.jpg";
+import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
 
 export const LoginScreen = () => {
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={-200}
-        style={styles.container}
-      >
-        <ImageBackground style={styles.image} source={bg}>
-          <LoginForm />
-        </ImageBackground>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <KeyboardAvoidingContainer offsetAndroid={-230} offsetIos={-220}>
+      <ImageBackground style={styles.image} source={bg}>
+        <LoginForm />
+      </ImageBackground>
+    </KeyboardAvoidingContainer>
   );
 };
 

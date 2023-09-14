@@ -15,9 +15,9 @@ export const UserAvatar = () => {
         style={styles.addAvatar}
       >
         {userAva ? (
-          <EvilIcons name="minus" size={24} color={colors.avatarIconDelete} />
+          <EvilIcons name="minus" size={30} color={colors.avatarIconDelete} />
         ) : (
-          <EvilIcons name="plus" size={25} color={colors.avatarIcon} />
+          <EvilIcons name="plus" size={30} color={colors.avatarIcon} />
         )}
       </TouchableOpacity>
     </View>
@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 16,
-    marginTop: -40,
+    marginTop: -60,
     marginLeft: "auto",
     marginRight: "auto",
   },
@@ -40,6 +40,6 @@ const styles = StyleSheet.create({
   addAvatar: {
     position: "absolute",
     bottom: 14,
-    right: -12.5,
+    right: -15,
   },
 });

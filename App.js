@@ -1,24 +1,16 @@
 import { useFonts } from "expo-font";
-import { useCallback } from "react";
-import * as SplashScreen from "expo-splash-screen";
-import { LoginScreen } from "./src/screens/LoginScreen";
-import { RegistrationScreen } from "./src/screens/RegistrationScreen";
+import MainRouter from "./src/routes/MainRouter";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
+    "Roboto-Bold": require("./src/assets/fonts/Roboto-Bold.ttf"),
     "Roboto-Medium": require("./src/assets/fonts/Roboto-Medium.ttf"),
     "Roboto-Regular": require("./src/assets/fonts/Roboto-Regular.ttf"),
   });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   }
 
-  return <RegistrationScreen onLayout={onLayoutRootView} />;
+  return <MainRouter />;
 }

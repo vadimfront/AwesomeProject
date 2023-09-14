@@ -8,20 +8,15 @@ import {
 } from "react-native";
 import bg from "../assets/images/RegistrationScreenBg.jpg";
 import { RegistrationForm } from "../components/RegistrationForm";
+import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
 
 export const RegistrationScreen = () => {
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS == "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={-170}
-        style={styles.container}
-      >
-        <ImageBackground style={styles.image} source={bg}>
-          <RegistrationForm />
-        </ImageBackground>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <KeyboardAvoidingContainer offsetAndroid={-180} offsetIos={-170}>
+      <ImageBackground style={styles.image} source={bg}>
+        <RegistrationForm />
+      </ImageBackground>
+    </KeyboardAvoidingContainer>
   );
 };
 

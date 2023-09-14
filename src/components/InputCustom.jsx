@@ -1,17 +1,27 @@
 import React, { useState } from "react";
 import { StyleSheet, TextInput } from "react-native";
 import { colors } from "../constants/colors";
-import { fontSizes } from "../constants/FontSizes";
+import { fontSizes } from "../constants/fontSizes";
 
-export const InputCustom = ({ handleChange, values, inputName, ...props }) => {
+export const InputCustom = ({
+  handleChange,
+  value,
+  inputName,
+  style,
+  ...props
+}) => {
   const [isFocused, setIsFocused] = useState(null);
   return (
     <TextInput
-      value={values[inputName]}
+      value={value[inputName]}
       onChangeText={handleChange(inputName)}
       autoComplete="off"
       placeholderTextColor={colors.inputPlaceholderColor}
-      style={[styles.input, isFocused === inputName && styles.focusedInput]}
+      style={[
+        styles.input,
+        isFocused === inputName && styles.focusedInput,
+        { ...style },
+      ]}
       onFocus={() => setIsFocused(inputName)}
       onBlur={() => setIsFocused(null)}
       {...props}
@@ -22,8 +32,8 @@ export const InputCustom = ({ handleChange, values, inputName, ...props }) => {
 const styles = StyleSheet.create({
   input: {
     width: "100%",
-    height: 50,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     fontSize: 16,
     fontFamily: "Roboto-Regular",
     borderWidth: 1,
@@ -35,22 +45,5 @@ const styles = StyleSheet.create({
   focusedInput: {
     backgroundColor: "#fff",
     borderColor: colors.inpurtBorderFocused,
-  },
-  togglerPassword: {
-    position: "absolute",
-    display: "flex",
-    justifyContent: "center",
-    top: 0,
-    bottom: 0,
-    right: 16,
-  },
-  togglerPasswordText: {
-    color: colors.linkColor,
-  },
-  linkRegister: {
-    fontSize: fontSizes.defaultText,
-    marginTop: 16,
-    textAlign: "center",
-    color: colors.linkColor,
   },
 });

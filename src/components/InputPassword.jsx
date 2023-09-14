@@ -3,12 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 import { InputCustom } from "./InputCustom";
 
-export const InputPassword = ({
-  handleChange,
-  values,
-  inputName,
-  ...props
-}) => {
+export const InputPassword = ({ handleChange, value, inputName, ...props }) => {
   const [isPasswordShown, setIsPasswordShown] = useState(true);
 
   const switchPassword = () => {
@@ -22,7 +17,7 @@ export const InputPassword = ({
         inputMode="text"
         placeholder="Пароль"
         inputName={inputName}
-        values={values[inputName]}
+        value={value[inputName]}
         handleChange={handleChange}
         secureTextEntry={isPasswordShown}
         {...props}
