@@ -5,30 +5,22 @@ import { colors } from "../constants/colors";
 
 const UserProfile = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.profileWrapper}>
-        <Image source={avatar} style={styles.avatar} />
-        <View>
-          <Text style={styles.userName}>Natali Romanova</Text>
-          <Text style={styles.userEmail}>email@example.com</Text>
-        </View>
+    <View style={styles.profileWrapper}>
+      <Image source={avatar} style={styles.avatar} />
+      <View>
+        <Text style={styles.userName}>Natali Romanova</Text>
+        <Text style={styles.userEmail}>email@example.com</Text>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 32,
-    paddingLeft: 16,
-    paddingRight: 16,
-    backgroundColor: "#fff",
-  },
   profileWrapper: {
     flexDirection: "row",
     gap: 8,
     alignItems: "center",
+    marginBottom: 32,
   },
   avatar: {
     width: 60,

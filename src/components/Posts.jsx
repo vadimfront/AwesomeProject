@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { View, Text, Image } from "react-native";
 import { fontSizes } from "../constants/fontSizes";
 
@@ -9,30 +9,28 @@ import LocationModule from "./LocationModule";
 
 const Posts = ({ postData }) => {
   return (
-    <>
-      {postData.map(
-        ({
-          postId,
-          postImage,
-          postTitle,
-          postLikes,
-          postComments,
-          location,
-        }) => (
-          <View style={styles.postWrap} key={postId}>
-            <Image source={postImage} style={styles.postImg} />
-            <Text style={styles.postText}>{postTitle}</Text>
+    <FlatList
+      data={postData}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }) => {
+        return (
+          <View style={styles.postWrap} key={item.postId}>
+            <Image source={item.postImage} style={styles.postImg} />
+            <Text style={styles.postText}>{item.postTitle}</Text>
             <View style={styles.postModule}>
               <View style={styles.postModuleItem}>
-                <CommentModule postComments={postComments} postId={postId} />
-                <LikeModule postLikes={postLikes} />
+                <CommentModule
+                  postComments={item.postComments}
+                  postId={item.postId}
+                />
+                <LikeModule postLikes={item.postLikes} />
               </View>
-              <LocationModule location={location} />
+              <LocationModule location={item.location} />
             </View>
           </View>
-        )
-      )}
-    </>
+        );
+      }}
+    ></FlatList>
   );
 };
 
