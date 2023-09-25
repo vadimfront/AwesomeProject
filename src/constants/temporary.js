@@ -11,7 +11,15 @@ export const postData = [
     postTitle: "Ліс",
     postLikes: 152,
     postComments: 8,
-    location: "Ukraine",
+    location: {
+      locationName: "Харьков, Харьковская область, Украина",
+      coords: {
+        latitude: 49.99309385513399,
+        longitude: 36.23568880805463,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      },
+    },
     comments: [
       {
         id: "gtrtgh4",
@@ -71,13 +79,29 @@ export const postData = [
     postImage: postImgTwo,
     postTitle: "Захід на Чорному морі",
     postLikes: 200,
-    location: "Ukraine",
+    location: {
+      locationName: "Хайфа, Израиль",
+      coords: {
+        latitude: 32.79369893974901,
+        longitude: 34.98862187518772,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      },
+    },
   },
   {
     postId: 3,
     postImage: postImgThree,
     postTitle: "Старий будиночок у Венеції",
     postLikes: 200,
-    location: "Italy",
+    location: {
+      locationName: "Тель-Авив, Израиль",
+      coords: {
+        latitude: 32.085594705636694,
+        longitude: 34.78419842098831,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      },
+    },
   },
 ];

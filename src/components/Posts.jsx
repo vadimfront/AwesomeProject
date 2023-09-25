@@ -6,8 +6,10 @@ import { fontSizes } from "../constants/fontSizes";
 import LikeModule from "./LikeModule";
 import CommentModule from "./CommentModule";
 import LocationModule from "./LocationModule";
+import { useNavigation } from "@react-navigation/native";
 
 const Posts = ({ postData }) => {
+  const navigation = useNavigation();
   return (
     <FlatList
       data={postData}
@@ -25,7 +27,7 @@ const Posts = ({ postData }) => {
                 />
                 <LikeModule postLikes={item.postLikes} />
               </View>
-              <LocationModule location={item.location} />
+              <LocationModule locationData={item.location} />
             </View>
           </View>
         );
@@ -51,6 +53,7 @@ const styles = StyleSheet.create({
   },
   postModule: {
     flexDirection: "row",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 24,
     marginTop: 10,

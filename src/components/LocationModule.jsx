@@ -1,18 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ButtonNavigationIcon } from "./ButtonNavigationIcon";
 import { colors } from "../constants/colors";
 import { Text } from "react-native";
 import { StyleSheet } from "react-native";
 
-const LocationModule = ({ location }) => {
+const LocationModule = ({ locationData }) => {
   return (
     <ButtonNavigationIcon
       iconName="map-pin"
       color={colors.iconColor}
       style={styles.locationModule}
       navigateTo="Map"
+      params={locationData}
     >
-      <Text style={styles.locationName}>{location}</Text>
+      <Text style={styles.locationName}>{locationData.locationName}</Text>
     </ButtonNavigationIcon>
   );
 };

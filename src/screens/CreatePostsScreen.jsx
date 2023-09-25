@@ -1,28 +1,38 @@
 import React from "react";
 import { PostForm } from "../components/PostForm";
-import { ScrollView, StyleSheet, View } from "react-native";
-import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  KeyboardAvoidingView,
+} from "react-native";
 
 export const CreatePostsScreen = () => {
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#fff" }}
-      contentContainerStyle={{ flexGrow: 1 }}
-      showsVerticalScrollIndicator={false}
-      bounces={false}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === "ios" ? -60 : -30}
     >
-      <KeyboardAvoidingContainer offsetAndroid={-30} offsetIos={-60}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
         <View style={styles.container}>
           <PostForm />
         </View>
-      </KeyboardAvoidingContainer>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    flexDirection: "row",
+    flexDirection: "column",
+    paddingHorizontal: 16,
+    paddingVertical: 32,
+    backgroundColor: "#fff",
   },
 });
