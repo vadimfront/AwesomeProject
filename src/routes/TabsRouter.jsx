@@ -83,6 +83,7 @@ const TabsRouter = () => {
             paddingLeft: 16,
           },
           tabBarStyle: { display: "none" },
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen

@@ -4,7 +4,7 @@ import { ButtonCustom } from "./ButtonCustom";
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../constants/colors";
 
-export const UploadImage = ({ setImageFunc, image }) => {
+export const UploadImage = ({ setSelectedImage, image }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,7 +23,7 @@ export const UploadImage = ({ setImageFunc, image }) => {
         quality: 1,
       });
       if (!result.canceled) {
-        setImageFunc(result.assets[0].uri);
+        setSelectedImage(result.assets[0].uri);
         setError("");
       }
     } catch (error) {

@@ -5,7 +5,7 @@ import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 
-export const CameraComponent = ({ setImageFunc, image }) => {
+export const CameraComponent = ({ setSelectedImage, image }) => {
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
@@ -14,9 +14,13 @@ export const CameraComponent = ({ setImageFunc, image }) => {
 
   useEffect(() => {
     (async () => {
-      MediaLibrary.requestPermissionsAsync();
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === "granted");
+      try {
+        MediaLibrary.requestPermissionsAsync();
+        const cameraStatus = await Camera.requestCameraPermissionsAsync();
+        setHasCameraPermission(cameraStatus.status === "granted");
+      } catch (error) {
+        console.error("Permission to access media library not granted", error);
+      }
     })();
   }, []);
 
@@ -24,7 +28,7 @@ export const CameraComponent = ({ setImageFunc, image }) => {
     if (cameraRef) {
       try {
         const data = await cameraRef.current.takePictureAsync({ quality: 0.3 });
-        setImageFunc(data.uri);
+        setSelectedImage(data.uri);
         setIsIconShown(true);
       } catch (error) {}
     }
@@ -44,13 +48,13 @@ export const CameraComponent = ({ setImageFunc, image }) => {
 
   const removeImage = () => {
     setIsIconShown(false);
-    setImageFunc(null);
+    setSelectedImage(null);
   };
 
   if (hasCameraPermission === false) {
     return <Text>No access to camera</Text>;
   }
-  console.log(image);
+
   return (
     <View
       style={{
@@ -76,12 +80,7 @@ export const CameraComponent = ({ setImageFunc, image }) => {
         />
       )}
 
-      <View
-        style={[
-          styles.iconTopOptions,
-          !isIconShown && image && { display: "none" },
-        ]}
-      >
+      <View style={[styles.iconTopOptions, image && { display: "none" }]}>
         <ButtonIcon
           iconName="repeat"
           color={type === CameraType.front ? colors.activeColor : "#fff"}

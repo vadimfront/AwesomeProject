@@ -1,6 +1,13 @@
+import React, { useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
-import React, { useRef, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import * as Yup from "yup";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { colors } from "../constants/colors";
 import { ButtonCustom } from "./ButtonCustom";
 import { ButtonIcon } from "./ButtonIcon";
@@ -10,49 +17,84 @@ import { useLocation } from "../hooks/useLocation";
 import { UploadImage } from "./UploadImage";
 import { useNavigation } from "@react-navigation/native";
 
+const СreatePostSchema = Yup.object().shape({
+  image: Yup.string().required("Ви не обрали зображення"),
+  postTitle: Yup.string().required("Потрібно ввести заголовок"),
+  location: Yup.string().required("Потрібно встановити локацію"),
+});
+
 export const PostForm = () => {
-  const { setCurrentPlace, loading } = useLocation();
+  const { getCurrentPlace, getLocationFromAddress, loading } = useLocation();
   const [image, setImage] = useState(null);
   const formikRef = useRef(null);
   const navigation = useNavigation();
 
-  const setImageFunc = (img) => {
+  const setSelectedImage = (img) => {
     setImage(img);
     formikRef.current.setFieldValue("image", img);
   };
 
   const autoLocationHandler = async () => {
-    const locationName = await setCurrentPlace();
+    const locationName = await getCurrentPlace();
     formikRef.current.setFieldValue("location", locationName);
   };
 
+  const resetFormHandler = (resetForm) => {
+    resetForm();
+    setImage(null);
+  };
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.defaultFlex}>
       <View style={styles.photo}>
-        <CameraComponent setImageFunc={setImageFunc} image={image} />
+        <CameraComponent setSelectedImage={setSelectedImage} image={image} />
       </View>
-      <UploadImage setImageFunc={setImageFunc} image={image} />
+      <UploadImage setSelectedImage={setSelectedImage} image={image} />
       <Formik
         initialValues={{ image: null, postTitle: "", location: "" }}
         innerRef={formikRef}
-        onSubmit={(values, { resetForm }) => {
-          console.log(values);
-          resetForm();
-          setImage(null);
+        validationSchema={СreatePostSchema}
+        onSubmit={async (values, { resetForm }) => {
+          const coords = await getLocationFromAddress(
+            values.location.toString()
+          );
+
+          const newData = {
+            ...values,
+            coords: coords,
+          };
+
+          console.log(newData);
+
+          resetFormHandler(resetForm);
           navigation.navigate("PostsScreen");
         }}
       >
-        {({ handleChange, handleSubmit, values, resetForm, setFieldValue }) => (
-          <View style={{ flex: 1, justifyContent: "space-between" }}>
-            {loading && <Text>Loading...</Text>}
+        {({
+          handleChange,
+          handleSubmit,
+          values,
+          resetForm,
+          setFieldValue,
+          errors,
+          touched,
+          validateOnMount,
+          isValid,
+        }) => (
+          <View style={styles.formContainer}>
+            {loading && <ActivityIndicator size="large" color="#00ff00" />}
             <View>
               <InputCustom
                 inputName="image"
                 value={values}
                 handleChange={handleChange}
                 inputMode="text"
-                style={{ display: "none" }}
+                style={styles.hide}
               />
+              {errors.image && touched.image ? (
+                <Text style={styles.error}>{errors.image}</Text>
+              ) : null}
+
               <View style={styles.inputGroup}>
                 <InputCustom
                   inputName="postTitle"
@@ -62,21 +104,10 @@ export const PostForm = () => {
                   placeholder="Назва..."
                   style={styles.input}
                 />
-
-                <View style={{ position: "relative" }}>
-                  <TouchableOpacity
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      width: 20,
-                      height: 20,
-                      backgroundColor: "red",
-                      zIndex: 99,
-                    }}
-                    onPress={() => autoLocationHandler(setFieldValue)}
-                  >
-                    <Text>+</Text>
-                  </TouchableOpacity>
+                {errors.postTitle && touched.postTitle ? (
+                  <Text style={styles.error}>{errors.postTitle}</Text>
+                ) : null}
+                <View style={styles.inputGroup}>
                   <InputCustom
                     inputName="location"
                     value={values}
@@ -85,27 +116,38 @@ export const PostForm = () => {
                     placeholder="Місцевість"
                     style={styles.input}
                   />
+                  {errors.location && touched.location ? (
+                    <Text style={styles.error}>{errors.location}</Text>
+                  ) : null}
                 </View>
+                <TouchableOpacity
+                  onPress={() => autoLocationHandler(setFieldValue)}
+                >
+                  <Text>Встановити локацію автоматично</Text>
+                </TouchableOpacity>
               </View>
 
               <ButtonCustom
                 onPress={handleSubmit}
-                textStyle={{ color: colors.inputPlaceholderColor }}
+                textStyle={{
+                  color: isValid ? "#fff" : colors.inputPlaceholderColor,
+                }}
                 style={{
-                  backgroundColor: colors.createPostDefault,
+                  backgroundColor: isValid
+                    ? colors.btnBgColor
+                    : colors.createPostDefault,
                 }}
               >
                 Опубліковати
               </ButtonCustom>
             </View>
-            <View style={{ alignItems: "center" }}>
+            <View style={styles.trashBtnContainer}>
               <ButtonIcon
                 iconName="trash-2"
                 color={colors.iconColor}
                 style={styles.btnTrash}
                 onPressHandler={() => {
-                  resetForm();
-                  setImage(null);
+                  resetFormHandler(resetForm);
                 }}
               />
             </View>
@@ -117,6 +159,19 @@ export const PostForm = () => {
 };
 
 const styles = StyleSheet.create({
+  error: {
+    color: "red",
+  },
+  hide: {
+    display: "none",
+  },
+  defaultFlex: {
+    flex: 1,
+  },
+  formContainer: {
+    flex: 1,
+    justifyContent: "space-between",
+  },
   photo: {
     backgroundColor: "#000",
     borderRadius: 8,
@@ -144,7 +199,7 @@ const styles = StyleSheet.create({
     color: colors.inputPlaceholderColor,
   },
   inputGroup: {
-    marginVertical: 32,
+    paddingVertical: 32,
     gap: 16,
   },
   input: {
@@ -154,6 +209,10 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderRadius: 0,
     paddingHorizontal: 0,
+  },
+  trashBtnContainer: {
+    marginTop: 20,
+    alignItems: "center",
   },
   btnTrash: {
     width: 70,

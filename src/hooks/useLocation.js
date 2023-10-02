@@ -8,9 +8,16 @@ export const useLocation = () => {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setError("Permission to access location was denied");
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          setError("Permission to access location was denied");
+        }
+      } catch (error) {
+        console.error(
+          "An error occurred while requesting location permissions:",
+          error
+        );
       }
     })();
   }, []);
@@ -28,6 +35,24 @@ export const useLocation = () => {
     }
   };
 
+  const getLocationFromAddress = async (address) => {
+    try {
+      setLoading(true);
+      const location = await Location.geocodeAsync(address);
+
+      if (location.length > 0) {
+        const { latitude, longitude } = location[0];
+        return { latitude, longitude };
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(`An error occurred: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const setLocationMarkers = async () => {
     try {
       const coords = await getCoords();
@@ -37,7 +62,7 @@ export const useLocation = () => {
     }
   };
 
-  const setCurrentPlace = async () => {
+  const getCurrentPlace = async () => {
     setLoading(true);
 
     try {
@@ -60,7 +85,8 @@ export const useLocation = () => {
   return {
     setLocationMarkers,
     markerLocation,
-    setCurrentPlace,
+    getCurrentPlace,
+    getLocationFromAddress,
     loading,
     error,
   };

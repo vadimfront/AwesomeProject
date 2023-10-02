@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ButtonNavigationIcon } from "./ButtonNavigationIcon";
 import { colors } from "../constants/colors";
 import { Text } from "react-native";

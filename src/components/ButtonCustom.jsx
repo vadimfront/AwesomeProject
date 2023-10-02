@@ -2,9 +2,19 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { colors } from "../constants/colors";
 
-export const ButtonCustom = ({ onPress, children, style, textStyle }) => {
+export const ButtonCustom = ({
+  onPress,
+  children,
+  style,
+  textStyle,
+  ...props
+}) => {
   return (
-    <TouchableOpacity style={[styles.btn, { ...style }]} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.btn, { ...style }]}
+      onPress={onPress}
+      {...props}
+    >
       <Text style={[styles.btnText, { ...textStyle }]}>{children}</Text>
     </TouchableOpacity>
   );

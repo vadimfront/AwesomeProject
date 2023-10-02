@@ -10,12 +10,13 @@ import {
 export const CreatePostsScreen = () => {
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      keyboardVerticalOffset={Platform.OS === "ios" ? -60 : -30}
+      style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
+      behavior={Platform.OS == "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={90}
     >
       <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
+        style={styles.defaultFlex}
+        contentContainerStyle={styles.flexGrow}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
@@ -28,8 +29,15 @@ export const CreatePostsScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  defaultFlex: {
+    flex: 1,
+  },
+  flexGrow: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
+    justifyContent: "center",
     flexDirection: "column",
     paddingHorizontal: 16,
     paddingVertical: 32,
