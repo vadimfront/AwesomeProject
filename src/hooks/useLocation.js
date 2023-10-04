@@ -70,7 +70,8 @@ export const useLocation = () => {
       const location = await Location.reverseGeocodeAsync({ ...coords });
 
       if (location && location.length > 0 && coords) {
-        const formattedAddress = `${location[0].country},${location[0].city},${location[0].street}`;
+        console.log(location);
+        const formattedAddress = `${location[0].country}, ${location[0].city}, ${location[0].street}, ${location[0].streetNumber}`;
         return formattedAddress;
       } else {
         return null;

@@ -24,6 +24,7 @@ const СreatePostSchema = Yup.object().shape({
 });
 
 export const PostForm = () => {
+  const [isCoordsError, setIsCoordsError] = useState(false);
   const { getCurrentPlace, getLocationFromAddress, loading } = useLocation();
   const [image, setImage] = useState(null);
   const formikRef = useRef(null);
@@ -54,10 +55,15 @@ export const PostForm = () => {
         initialValues={{ image: null, postTitle: "", location: "" }}
         innerRef={formikRef}
         validationSchema={СreatePostSchema}
+        validateOnMount={true}
         onSubmit={async (values, { resetForm }) => {
           const coords = await getLocationFromAddress(
             values.location.toString()
           );
+          if (!coords) {
+            setIsCoordsError(true);
+            return;
+          }
 
           const newData = {
             ...values,
@@ -78,11 +84,10 @@ export const PostForm = () => {
           setFieldValue,
           errors,
           touched,
-          validateOnMount,
+
           isValid,
         }) => (
           <View style={styles.formContainer}>
-            {loading && <ActivityIndicator size="large" color="#00ff00" />}
             <View>
               <InputCustom
                 inputName="image"
@@ -108,23 +113,47 @@ export const PostForm = () => {
                   <Text style={styles.error}>{errors.postTitle}</Text>
                 ) : null}
                 <View style={styles.inputGroup}>
-                  <InputCustom
-                    inputName="location"
-                    value={values}
-                    handleChange={handleChange}
-                    inputMode="text"
-                    placeholder="Місцевість"
-                    style={styles.input}
-                  />
+                  <View style={styles.locationWrapper}>
+                    <InputCustom
+                      inputName="location"
+                      value={values}
+                      handleChange={handleChange}
+                      inputMode="text"
+                      placeholder="Місцевість"
+                      style={{ ...styles.input, ...styles.locationInput }}
+                    />
+                    {!loading && (
+                      <ButtonIcon
+                        iconName="map-pin"
+                        onPressHandler={() =>
+                          autoLocationHandler(setFieldValue)
+                        }
+                        style={styles.btnLocationIcon}
+                        color={colors.inputPlaceholderColor}
+                      />
+                    )}
+                    {loading && (
+                      <ActivityIndicator
+                        size="large"
+                        color="#000"
+                        style={{ position: "absolute" }}
+                      />
+                    )}
+                  </View>
                   {errors.location && touched.location ? (
                     <Text style={styles.error}>{errors.location}</Text>
                   ) : null}
+                  {isCoordsError && (
+                    <Text style={styles.error}>
+                      Помилка визначення локації. Можливо адреса не вірна
+                    </Text>
+                  )}
                 </View>
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   onPress={() => autoLocationHandler(setFieldValue)}
                 >
                   <Text>Встановити локацію автоматично</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               <ButtonCustom
@@ -137,6 +166,7 @@ export const PostForm = () => {
                     ? colors.btnBgColor
                     : colors.createPostDefault,
                 }}
+                disabled={!isValid}
               >
                 Опубліковати
               </ButtonCustom>
@@ -209,6 +239,16 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderRadius: 0,
     paddingHorizontal: 0,
+  },
+  locationWrapper: {
+    position: "relative",
+    justifyContent: "center",
+  },
+  locationInput: {
+    paddingLeft: 35,
+  },
+  btnLocationIcon: {
+    position: "absolute",
   },
   trashBtnContainer: {
     marginTop: 20,

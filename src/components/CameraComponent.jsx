@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Camera, CameraType } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
-import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 
@@ -10,6 +10,7 @@ export const CameraComponent = ({ setSelectedImage, image }) => {
   const [type, setType] = useState(Camera.Constants.Type.back);
   const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
   const [isIconShown, setIsIconShown] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -27,10 +28,15 @@ export const CameraComponent = ({ setSelectedImage, image }) => {
   const takePicture = async () => {
     if (cameraRef) {
       try {
+        setIsLoading(true);
         const data = await cameraRef.current.takePictureAsync({ quality: 0.3 });
         setSelectedImage(data.uri);
         setIsIconShown(true);
-      } catch (error) {}
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -126,7 +132,7 @@ export const CameraComponent = ({ setSelectedImage, image }) => {
           )}
         </View>
 
-        {!image && (
+        {!image && !isLoading && (
           <ButtonIcon
             iconName="camera"
             color={colors.inputBorder}
