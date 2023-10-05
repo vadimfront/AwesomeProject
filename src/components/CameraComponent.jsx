@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Camera, CameraType } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, ActivityIndicator } from "react-native";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 
@@ -139,6 +139,9 @@ export const CameraComponent = ({ setSelectedImage, image }) => {
             onPress={takePicture}
             style={styles.photoIcon}
           />
+        )}
+        {isLoading && (
+          <ActivityIndicator size="large" color="#fff" style={styles.spinner} />
         )}
       </View>
     </View>

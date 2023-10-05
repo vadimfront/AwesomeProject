@@ -8,6 +8,7 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import { ButtonCustom } from "./ButtonCustom";
 import { ButtonIcon } from "./ButtonIcon";
@@ -20,12 +21,12 @@ import { useNavigation } from "@react-navigation/native";
 const СreatePostSchema = Yup.object().shape({
   image: Yup.string().required("Ви не обрали зображення"),
   postTitle: Yup.string().required("Потрібно ввести заголовок"),
-  location: Yup.string().required("Потрібно встановити локацію"),
+  location: Yup.string(),
 });
 
 export const PostForm = () => {
-  const [isCoordsError, setIsCoordsError] = useState(false);
-  const { getCurrentPlace, getLocationFromAddress, loading } = useLocation();
+  // const [isCoordsError, setIsCoordsError] = useState(false);
+  const { loading, getCoords } = useLocation();
   const [image, setImage] = useState(null);
   const formikRef = useRef(null);
   const navigation = useNavigation();
@@ -57,13 +58,15 @@ export const PostForm = () => {
         validationSchema={СreatePostSchema}
         validateOnMount={true}
         onSubmit={async (values, { resetForm }) => {
-          const coords = await getLocationFromAddress(
-            values.location.toString()
-          );
-          if (!coords) {
-            setIsCoordsError(true);
-            return;
-          }
+          // const coords = await getLocationFromAddress(
+          //   values.location.toString()
+          // );
+          // if (!coords) {
+          //   setIsCoordsError(true);
+          //   return;
+          // }
+
+          const coords = await getCoords();
 
           const newData = {
             ...values,
@@ -81,7 +84,6 @@ export const PostForm = () => {
           handleSubmit,
           values,
           resetForm,
-          setFieldValue,
           errors,
           touched,
 
@@ -122,32 +124,26 @@ export const PostForm = () => {
                       placeholder="Місцевість"
                       style={{ ...styles.input, ...styles.locationInput }}
                     />
-                    {!loading && (
-                      <ButtonIcon
-                        iconName="map-pin"
-                        onPressHandler={() =>
-                          autoLocationHandler(setFieldValue)
-                        }
-                        style={styles.btnLocationIcon}
-                        color={colors.inputPlaceholderColor}
-                      />
-                    )}
-                    {loading && (
-                      <ActivityIndicator
-                        size="large"
-                        color="#000"
-                        style={{ position: "absolute" }}
-                      />
-                    )}
+
+                    <Feather
+                      name="map-pin"
+                      style={styles.locationIcon}
+                      color={colors.inputPlaceholderColor}
+                      size={20}
+                    />
+
+                    {/* style={styles.btnLocationIcon}
+                      color={colors.inputPlaceholderColor}
+                       */}
                   </View>
                   {errors.location && touched.location ? (
                     <Text style={styles.error}>{errors.location}</Text>
                   ) : null}
-                  {isCoordsError && (
+                  {/* {isCoordsError && (
                     <Text style={styles.error}>
                       Помилка визначення локації. Можливо адреса не вірна
                     </Text>
-                  )}
+                  )} */}
                 </View>
                 {/* <TouchableOpacity
                   onPress={() => autoLocationHandler(setFieldValue)}
@@ -156,20 +152,33 @@ export const PostForm = () => {
                 </TouchableOpacity> */}
               </View>
 
-              <ButtonCustom
-                onPress={handleSubmit}
-                textStyle={{
-                  color: isValid ? "#fff" : colors.inputPlaceholderColor,
-                }}
-                style={{
-                  backgroundColor: isValid
-                    ? colors.btnBgColor
-                    : colors.createPostDefault,
-                }}
-                disabled={!isValid}
-              >
-                Опубліковати
-              </ButtonCustom>
+              <View style={styles.btnSubmitWrapper}>
+                <ButtonCustom
+                  onPress={handleSubmit}
+                  textStyle={{
+                    color:
+                      isValid && !loading
+                        ? "#fff"
+                        : colors.inputPlaceholderColor,
+                  }}
+                  style={{
+                    backgroundColor:
+                      isValid && !loading
+                        ? colors.btnBgColor
+                        : colors.createPostDefault,
+                  }}
+                  disabled={!isValid || loading}
+                >
+                  Опубліковати
+                </ButtonCustom>
+                {loading && (
+                  <ActivityIndicator
+                    size="large"
+                    color="#000"
+                    style={styles.spinner}
+                  />
+                )}
+              </View>
             </View>
             <View style={styles.trashBtnContainer}>
               <ButtonIcon
@@ -245,14 +254,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   locationInput: {
-    paddingLeft: 35,
+    paddingLeft: 25,
   },
-  btnLocationIcon: {
+  locationIcon: {
     position: "absolute",
   },
   trashBtnContainer: {
     marginTop: 20,
     alignItems: "center",
+  },
+  btnSubmitWrapper: {
+    position: "relative",
   },
   btnTrash: {
     width: 70,
@@ -261,5 +273,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.createPostDefault,
     borderRadius: 20,
+  },
+  spinner: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: -40,
   },
 });

@@ -24,6 +24,7 @@ export const useLocation = () => {
 
   const getCoords = async () => {
     try {
+      setLoading(true);
       let location = await Location.getCurrentPositionAsync({});
       const coords = {
         latitude: location.coords.latitude,
@@ -32,26 +33,28 @@ export const useLocation = () => {
       return coords;
     } catch (error) {
       setError("Error fetching location data");
-    }
-  };
-
-  const getLocationFromAddress = async (address) => {
-    try {
-      setLoading(true);
-      const location = await Location.geocodeAsync(address);
-
-      if (location.length > 0) {
-        const { latitude, longitude } = location[0];
-        return { latitude, longitude };
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(`An error occurred: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
+
+  // const getLocationFromAddress = async (address) => {
+  //   try {
+  //     setLoading(true);
+  //     const location = await Location.geocodeAsync(address);
+
+  //     if (location.length > 0) {
+  //       const { latitude, longitude } = location[0];
+  //       return { latitude, longitude };
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error(`An error occurred: ${error.message}`);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const setLocationMarkers = async () => {
     try {
@@ -62,32 +65,33 @@ export const useLocation = () => {
     }
   };
 
-  const getCurrentPlace = async () => {
-    setLoading(true);
+  // const getCurrentPlace = async () => {
+  //   setLoading(true);
 
-    try {
-      const coords = await getCoords();
-      const location = await Location.reverseGeocodeAsync({ ...coords });
+  //   try {
+  //     const coords = await getCoords();
+  //     const location = await Location.reverseGeocodeAsync({ ...coords });
 
-      if (location && location.length > 0 && coords) {
-        console.log(location);
-        const formattedAddress = `${location[0].country}, ${location[0].city}, ${location[0].street}, ${location[0].streetNumber}`;
-        return formattedAddress;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      setError("Error fetching place data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     if (location && location.length > 0 && coords) {
+  //       console.log(location);
+  //       const formattedAddress = `${location[0].country}, ${location[0].city}, ${location[0].street}, ${location[0].streetNumber}`;
+  //       return formattedAddress;
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     setError("Error fetching place data");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return {
     setLocationMarkers,
     markerLocation,
-    getCurrentPlace,
-    getLocationFromAddress,
+    getCoords,
+    // getCurrentPlace,
+    // getLocationFromAddress,
     loading,
     error,
   };
