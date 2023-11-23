@@ -2,6 +2,8 @@ import React from "react";
 import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { logOut } from "../redux/slices/usersSlice";
 
 export const ButtonNavigationIcon = ({
   iconName,
@@ -10,15 +12,21 @@ export const ButtonNavigationIcon = ({
   navigateTo,
   children,
   params,
+  type,
   ...props
 }) => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+
+  const onPressButtonHandler = () => {
+    if (type === "logOut") {
+      dispatch(logOut());
+    }
+    navigation.navigate(navigateTo, { ...params });
+  };
 
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate(navigateTo, { ...params })}
-      {...props}
-    >
+    <TouchableOpacity onPress={() => onPressButtonHandler()} {...props}>
       <Feather name={iconName} size={size} color={color} />
       {children}
     </TouchableOpacity>

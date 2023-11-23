@@ -16,8 +16,9 @@ export const InputPassword = ({ handleChange, value, inputName, ...props }) => {
         autoCapitalize="none"
         inputMode="text"
         placeholder="Пароль"
+        autoComplete="off"
         inputName={inputName}
-        value={value[inputName]}
+        value={value}
         handleChange={handleChange}
         secureTextEntry={isPasswordShown}
         {...props}

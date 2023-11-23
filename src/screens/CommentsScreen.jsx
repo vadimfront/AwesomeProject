@@ -1,18 +1,20 @@
 import { useRoute } from "@react-navigation/native";
 import React, { useEffect, useRef, useState } from "react";
-import { postData } from "../constants/temporary";
 import { Animated, StyleSheet, View } from "react-native";
 
 import { CommentsList } from "../components/CommentsList";
 import { CommentForm } from "../components/CommentForm";
 
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
+import { selectPosts } from "../redux/selectors/userSelectors";
+import { useSelector } from "react-redux";
 
 export const CommentsScreen = () => {
   const {
     params: { postId },
   } = useRoute();
 
+  const { posts } = useSelector(selectPosts);
   const [fixed, setFixed] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -43,8 +45,8 @@ export const CommentsScreen = () => {
 
   const imageStyle = fixed ? styles.fixedPostImg : styles.postImg;
 
-  const index = postData.findIndex((post) => post.postId === postId);
-  const { comments } = postData[index];
+  const index = posts.findIndex((post) => post.id === postId);
+  const commentsData = posts[index]?.comments;
   return (
     <KeyboardAvoidingContainer
       offsetAndroid={90}
@@ -53,12 +55,12 @@ export const CommentsScreen = () => {
     >
       <View style={styles.container}>
         <Animated.Image
-          source={postData[index].postImage}
+          src={posts[index]?.postImage}
           style={[imageStyle, { opacity: fadeAnim }]}
         />
 
-        <CommentsList commentsData={comments} />
-        <CommentForm handlerFocus={handlerFocus} />
+        <CommentsList commentsData={commentsData} />
+        <CommentForm postId={postId} handlerFocus={handlerFocus} />
       </View>
     </KeyboardAvoidingContainer>
   );

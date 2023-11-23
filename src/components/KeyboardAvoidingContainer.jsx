@@ -22,7 +22,7 @@ const KeyboardAvoidingContainer = ({
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.select({
           ios: offsetIos,
-          android: offsetAndroid, // Adjust this value based on your UI
+          android: offsetAndroid,
         })}
       >
         {children}

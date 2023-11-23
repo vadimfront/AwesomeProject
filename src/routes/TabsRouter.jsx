@@ -55,6 +55,7 @@ const TabsRouter = () => {
 
           headerRight: () => (
             <ButtonNavigationIcon
+              type="logOut"
               iconName="log-out"
               color={colors.iconColor}
               navigateTo="Login"

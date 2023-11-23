@@ -1,26 +1,77 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import React from "react";
+import { Image, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
-import avatar from "../assets/images/avatar.jpg";
 import { colors } from "../constants/colors";
+import { fontSizes } from "../constants/fontSizes";
+import { usePickImage } from "../hooks/usePickImage";
+import { avatarPlaceholder } from "../constants/constants";
+import { selectAuth } from "../redux/selectors/userSelectors";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { updateProfileImage } from "../redux/operations";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 export const UserAvatar = () => {
-  const [userAva, setUserAva] = useState(avatar);
+  const { profile, loading, auth } = useSelector(selectAuth);
+  const dispatch = useDispatch();
+  const { pickImage, pickedImage, removePickedImage } = usePickImage();
+
+  const imageSrc = profile ? profile.userProfileImage.url : pickedImage;
+
+  useEffect(() => {
+    if (auth && pickedImage) {
+      const dataToUpdate = {
+        docId: auth,
+        userProfileImage: { type: "own", url: pickedImage },
+      };
+      dispatch(updateProfileImage(dataToUpdate));
+    }
+  }, [pickedImage]);
+
+  const removeProfileImage = () => {
+    const dataToUpdate = {
+      collectionName: "users",
+      docId: auth,
+      userProfileImage: { type: "default", url: avatarPlaceholder },
+    };
+    removePickedImage();
+    dispatch(updateProfileImage(dataToUpdate));
+  };
 
   return (
-    <View style={styles.avatar}>
-      {userAva && <Image source={avatar} style={styles.avatarImage} />}
-      <TouchableOpacity
-        onPress={() => setUserAva(!userAva ? avatar : null)}
-        style={styles.addAvatar}
-      >
-        {userAva ? (
-          <EvilIcons name="minus" size={30} color={colors.avatarIconDelete} />
+    <>
+      <View style={styles.avatar}>
+        {pickedImage ? (
+          <Image source={{ uri: pickedImage }} style={styles.avatarImage} />
         ) : (
-          <EvilIcons name="plus" size={30} color={colors.avatarIcon} />
+          <Image
+            src={imageSrc || avatarPlaceholder}
+            style={styles.avatarImage}
+          />
         )}
-      </TouchableOpacity>
-    </View>
+        <View style={styles.addAvatar}>
+          {profile?.type === "default" || !pickedImage ? (
+            <TouchableOpacity onPress={pickImage}>
+              <EvilIcons name="plus" size={30} color={colors.avatarIcon} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={removeProfileImage}>
+              <EvilIcons
+                name="minus"
+                size={30}
+                color={colors.avatarIconDelete}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+        <Text style={styles.userName}></Text>
+      </View>
+      <LoadingSpinner
+        loading={loading}
+        overlayColor={colors.btnBgColor}
+        text="Загрузка..."
+      />
+    </>
   );
 };
 
@@ -35,11 +86,20 @@ const styles = StyleSheet.create({
     marginRight: "auto",
   },
   avatarImage: {
+    width: 120,
+    height: 120,
     borderRadius: 16,
   },
   addAvatar: {
     position: "absolute",
     bottom: 14,
     right: -15,
+  },
+  userName: {
+    fontSize: fontSizes.titleFirstLevel,
+    fontFamily: "Roboto-Medium",
+    letterSpacing: 0.3,
+    textAlign: "center",
+    marginVertical: 32,
   },
 });

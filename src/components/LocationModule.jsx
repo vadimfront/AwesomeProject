@@ -4,16 +4,17 @@ import { colors } from "../constants/colors";
 import { Text } from "react-native";
 import { StyleSheet } from "react-native";
 
-const LocationModule = ({ locationData }) => {
+const LocationModule = ({ location }) => {
+  const { address, coords } = location;
   return (
     <ButtonNavigationIcon
       iconName="map-pin"
       color={colors.iconColor}
       style={styles.locationModule}
       navigateTo="Map"
-      params={locationData}
+      params={coords}
     >
-      <Text style={styles.locationName}>{locationData.locationName}</Text>
+      <Text style={styles.locationName}>{address}</Text>
     </ButtonNavigationIcon>
   );
 };

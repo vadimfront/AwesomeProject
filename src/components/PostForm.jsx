@@ -1,13 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import { ButtonCustom } from "./ButtonCustom";
@@ -17,6 +11,10 @@ import { CameraComponent } from "./CameraComponent";
 import { useLocation } from "../hooks/useLocation";
 import { UploadImage } from "./UploadImage";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+import { createPost } from "../redux/operations";
+import { selectAuth } from "../redux/selectors/userSelectors";
+import { getCurrentDateAndTime } from "../helpers/helpers";
 
 const СreatePostSchema = Yup.object().shape({
   image: Yup.string().required("Ви не обрали зображення"),
@@ -25,25 +23,47 @@ const СreatePostSchema = Yup.object().shape({
 });
 
 export const PostForm = () => {
-  // const [isCoordsError, setIsCoordsError] = useState(false);
-  const { loading, getCoords } = useLocation();
+  const { getLocationFromAddress, coordsLoading } = useLocation();
   const [image, setImage] = useState(null);
+
+  const { profile, auth } = useSelector(selectAuth);
+
   const formikRef = useRef(null);
   const navigation = useNavigation();
+
+  const dispatch = useDispatch();
 
   const setSelectedImage = (img) => {
     setImage(img);
     formikRef.current.setFieldValue("image", img);
   };
 
-  const autoLocationHandler = async () => {
-    const locationName = await getCurrentPlace();
-    formikRef.current.setFieldValue("location", locationName);
-  };
-
   const resetFormHandler = (resetForm) => {
     resetForm();
     setImage(null);
+  };
+
+  const handleCreatePost = async (data) => {
+    const { image, postTitle, location } = data;
+
+    const coords = await getLocationFromAddress(location);
+
+    const postDate = {
+      postImage: image,
+      postTitle: postTitle,
+      location: {
+        address: location,
+        coords: coords,
+      },
+      author: {
+        id: auth,
+        name: profile.userName,
+        photo: profile.userProfileImage.url,
+      },
+      date: getCurrentDateAndTime(),
+    };
+
+    dispatch(createPost(postDate));
   };
 
   return (
@@ -58,24 +78,7 @@ export const PostForm = () => {
         validationSchema={СreatePostSchema}
         validateOnMount={true}
         onSubmit={async (values, { resetForm }) => {
-          // const coords = await getLocationFromAddress(
-          //   values.location.toString()
-          // );
-          // if (!coords) {
-          //   setIsCoordsError(true);
-          //   return;
-          // }
-
-          const coords = await getCoords();
-
-          const newData = {
-            ...values,
-            coords: coords,
-          };
-
-          console.log(newData);
-
-          resetFormHandler(resetForm);
+          handleCreatePost(values);
           navigation.navigate("PostsScreen");
         }}
       >
@@ -131,25 +134,11 @@ export const PostForm = () => {
                       color={colors.inputPlaceholderColor}
                       size={20}
                     />
-
-                    {/* style={styles.btnLocationIcon}
-                      color={colors.inputPlaceholderColor}
-                       */}
                   </View>
                   {errors.location && touched.location ? (
                     <Text style={styles.error}>{errors.location}</Text>
                   ) : null}
-                  {/* {isCoordsError && (
-                    <Text style={styles.error}>
-                      Помилка визначення локації. Можливо адреса не вірна
-                    </Text>
-                  )} */}
                 </View>
-                {/* <TouchableOpacity
-                  onPress={() => autoLocationHandler(setFieldValue)}
-                >
-                  <Text>Встановити локацію автоматично</Text>
-                </TouchableOpacity> */}
               </View>
 
               <View style={styles.btnSubmitWrapper}>
@@ -157,27 +146,20 @@ export const PostForm = () => {
                   onPress={handleSubmit}
                   textStyle={{
                     color:
-                      isValid && !loading
+                      isValid && !coordsLoading
                         ? "#fff"
                         : colors.inputPlaceholderColor,
                   }}
                   style={{
                     backgroundColor:
-                      isValid && !loading
+                      isValid && !coordsLoading
                         ? colors.btnBgColor
                         : colors.createPostDefault,
                   }}
-                  disabled={!isValid || loading}
+                  disabled={!isValid || coordsLoading}
                 >
                   Опубліковати
                 </ButtonCustom>
-                {loading && (
-                  <ActivityIndicator
-                    size="large"
-                    color="#000"
-                    style={styles.spinner}
-                  />
-                )}
               </View>
             </View>
             <View style={styles.trashBtnContainer}>

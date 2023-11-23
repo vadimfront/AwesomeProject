@@ -1,22 +1,48 @@
 import React from "react";
 import { Formik } from "formik";
 import { StyleSheet } from "react-native";
-import { TextInput, View, Button } from "react-native";
+import { TextInput, View } from "react-native";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 import { Keyboard } from "react-native";
+import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
+import { useDispatch, useSelector } from "react-redux";
+import { createPostComment } from "../redux/operations";
+import { getCurrentDateAndTime } from "../helpers/helpers";
 
-export const CommentForm = ({ handlerFocus }) => {
+export const CommentForm = ({ postId, handlerFocus }) => {
+  const dispatch = useDispatch();
+
+  const { posts } = useSelector(selectPosts);
+  const { profile, auth } = useSelector(selectAuth);
+
+  const currentPostIndex = posts.findIndex((post) => post.id === postId);
+
+  const createPostHendler = ({ comment, resetForm }) => {
+    const commentData = [
+      ...posts[currentPostIndex].comments,
+      {
+        userId: auth,
+        ...profile,
+        comment,
+        date: getCurrentDateAndTime(),
+      },
+    ];
+
+    dispatch(createPostComment({ postId, commentData }));
+    Keyboard.dismiss();
+    resetForm();
+  };
+
   return (
     <Formik
       initialValues={{ comment: "" }}
-      onSubmit={(values, { resetForm }) => {
-        console.log(values);
-        Keyboard.dismiss();
-        resetForm();
+      onSubmit={({ comment }, { resetForm }) => {
+        createPostHendler({ comment, resetForm });
+        //resetForm();
       }}
     >
-      {({ handleChange, handleBlur, handleSubmit, values }) => (
+      {({ handleChange, handleSubmit, values }) => (
         <View style={styles.commentForm}>
           <View style={styles.groupWrap}>
             <TextInput
@@ -44,6 +70,7 @@ export const CommentForm = ({ handlerFocus }) => {
 const styles = StyleSheet.create({
   commentForm: {
     paddingVertical: 16,
+    justifyContent: "flex-end",
   },
   groupWrap: {
     position: "relative",

@@ -1,16 +1,24 @@
 import React from "react";
 import { Image, View, Text, StyleSheet } from "react-native";
-import avatar from "../assets/images/avatar.jpg";
 import { colors } from "../constants/colors";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../redux/selectors/userSelectors";
 
 const UserProfile = () => {
+  const { profile, error, errorMessage } = useSelector(selectAuth);
+
   return (
     <View style={styles.profileWrapper}>
-      <Image source={avatar} style={styles.avatar} />
-      <View>
-        <Text style={styles.userName}>Natali Romanova</Text>
-        <Text style={styles.userEmail}>email@example.com</Text>
-      </View>
+      {error && <Text>{errorMessage}</Text>}
+      {profile && (
+        <>
+          <Image src={profile.userProfileImage.url} style={styles.avatar} />
+          <View>
+            <Text style={styles.userName}>{profile.userName}</Text>
+            <Text style={styles.userEmail}>{profile.email}</Text>
+          </View>
+        </>
+      )}
     </View>
   );
 };

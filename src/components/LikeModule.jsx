@@ -1,23 +1,36 @@
-import React, { useState } from "react";
+import React from "react";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 import { StyleSheet, Text } from "react-native";
+import { useDispatch } from "react-redux";
+import { updateLike } from "../redux/operations";
 
-const LikeModule = ({ postLikes = 0 }) => {
-  const [likeCounter, setLikeCounter] = useState(postLikes);
+const LikeModule = ({ likes, postId, userId }) => {
+  const dispatch = useDispatch();
+
+  const handleLike = () => {
+    if (likes.includes(userId)) {
+      const newArrLikes = likes.filter((like) => like !== userId);
+      dispatch(updateLike({ postId, newArrLikes }));
+    } else {
+      const newArrLikes = [...likes, userId];
+      dispatch(updateLike({ postId, newArrLikes }));
+    }
+  };
+
   return (
     <ButtonIcon
       iconName="thumbs-up"
-      color={likeCounter ? colors.activeColor : colors.iconColor}
-      onPressHandler={() => setLikeCounter(likeCounter + 1)}
+      color={likes.length ? colors.activeColor : colors.iconColor}
+      onPressHandler={() => handleLike()}
       style={styles.likeModule}
     >
       <Text
         style={{
-          color: likeCounter ? colors.baseTextColor : colors.iconColor,
+          color: likes.length ? colors.baseTextColor : colors.iconColor,
         }}
       >
-        {likeCounter}
+        {likes.length > 0 && likes.length}
       </Text>
     </ButtonIcon>
   );

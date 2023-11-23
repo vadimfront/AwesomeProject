@@ -6,11 +6,13 @@ import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
 
 export const LoginScreen = () => {
   return (
-    <KeyboardAvoidingContainer offsetAndroid={-230} offsetIos={-220}>
-      <ImageBackground style={styles.image} source={bg}>
-        <LoginForm />
-      </ImageBackground>
-    </KeyboardAvoidingContainer>
+    <>
+      <KeyboardAvoidingContainer offsetAndroid={-230} offsetIos={-220}>
+        <ImageBackground style={styles.image} source={bg}>
+          <LoginForm />
+        </ImageBackground>
+      </KeyboardAvoidingContainer>
+    </>
   );
 };
 

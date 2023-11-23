@@ -7,23 +7,30 @@ import { ButtonNavigationIcon } from "../components/ButtonNavigationIcon";
 import { colors } from "../constants/colors";
 import { postData } from "../constants/temporary";
 import { fontSizes } from "../constants/fontSizes";
+import { selectAuth } from "../redux/selectors/userSelectors";
+import { useSelector } from "react-redux";
 
 export const ProfileScreen = () => {
+  const { profile } = useSelector(selectAuth);
+
   return (
-    <ImageBackground style={styles.image} source={bg}>
-      <View style={styles.container}>
-        <View style={styles.logOut}>
-          <ButtonNavigationIcon
-            iconName="log-out"
-            color={colors.iconColor}
-            navigateTo="Registration"
-          />
+    <>
+      <ImageBackground style={styles.image} source={bg}>
+        <View style={styles.container}>
+          <View style={styles.logOut}>
+            <ButtonNavigationIcon
+              type="logOut"
+              iconName="log-out"
+              color={colors.iconColor}
+              navigateTo="Registration"
+            />
+          </View>
+          <UserAvatar />
+          {profile && <Text style={styles.userName}>{profile.userName}</Text>}
+          <Posts />
         </View>
-        <UserAvatar />
-        <Text style={styles.userName}>Natali Romanova</Text>
-        <Posts postData={postData} />
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+    </>
   );
 };
 

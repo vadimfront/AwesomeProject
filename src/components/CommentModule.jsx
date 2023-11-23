@@ -3,21 +3,21 @@ import { ButtonNavigationIcon } from "./ButtonNavigationIcon";
 import { colors } from "../constants/colors";
 import { Text, StyleSheet } from "react-native";
 
-const CommentModule = ({ postComments = 0, postId }) => {
+const CommentModule = ({ commentsCount, postId }) => {
   return (
     <ButtonNavigationIcon
       iconName="message-circle"
-      color={postComments ? colors.activeColor : colors.iconColor}
+      color={commentsCount ? colors.activeColor : colors.iconColor}
       navigateTo="Comments"
       params={{ postId }}
       style={styles.commentsModule}
     >
       <Text
         style={{
-          color: postComments ? colors.baseTextColor : colors.iconColor,
+          color: commentsCount ? colors.baseTextColor : colors.iconColor,
         }}
       >
-        {postComments}
+        {commentsCount}
       </Text>
     </ButtonNavigationIcon>
   );

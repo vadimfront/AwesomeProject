@@ -1,5 +1,10 @@
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider, useSelector } from "react-redux";
+import store from "./src/redux/store";
+
 import { useFonts } from "expo-font";
 import MainRouter from "./src/routes/MainRouter";
+import Toast from "react-native-toast-message";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -12,5 +17,12 @@ export default function App() {
     return null;
   }
 
-  return <MainRouter />;
+  return (
+    <Provider store={store.store}>
+      <PersistGate loading={null} persistor={store.persistor}>
+        <MainRouter />
+        <Toast />
+      </PersistGate>
+    </Provider>
+  );
 }
