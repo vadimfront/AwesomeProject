@@ -3,7 +3,6 @@ import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { colors } from "../constants/colors";
 import { Formik } from "formik";
-import { fontSizes } from "../constants/fontSizes";
 import { UserAvatar } from "./UserAvatar";
 import { ButtonCustom } from "./ButtonCustom";
 import { InputPassword } from "./InputPassword";
@@ -15,6 +14,7 @@ import { toastMessage } from "../helpers/toastMessage";
 import * as Yup from "yup";
 import { selectAuth } from "../redux/selectors/userSelectors";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { fontSizes } from "../constants/fontSizes";
 
 export const RegistrationForm = () => {
   const navigation = useNavigation();
@@ -43,6 +43,7 @@ export const RegistrationForm = () => {
       userName: login,
     };
 
+    console.log(data);
     dispatch(signUp(data));
   };
 
@@ -86,9 +87,9 @@ export const RegistrationForm = () => {
     <>
       <View style={styles.form}>
         <UserAvatar
-          userAvatar={pickedImage}
-          uploadImage={pickImage}
-          removeAvatar={removePickedImage}
+          pickedImage={pickedImage}
+          pickImage={pickImage}
+          removePickedImage={removePickedImage}
         />
         <Text style={styles.title}>Реєстрація</Text>
         <View style={styles.container}>

@@ -5,13 +5,14 @@ import { UserAvatar } from "../components/UserAvatar";
 import Posts from "../components/Posts";
 import { ButtonNavigationIcon } from "../components/ButtonNavigationIcon";
 import { colors } from "../constants/colors";
-import { postData } from "../constants/temporary";
 import { fontSizes } from "../constants/fontSizes";
 import { selectAuth } from "../redux/selectors/userSelectors";
 import { useSelector } from "react-redux";
+import { usePickImage } from "../hooks/usePickImage";
 
 export const ProfileScreen = () => {
   const { profile } = useSelector(selectAuth);
+  const { pickImage, pickedImage, removePickedImage } = usePickImage();
 
   return (
     <>
@@ -25,9 +26,13 @@ export const ProfileScreen = () => {
               navigateTo="Registration"
             />
           </View>
-          <UserAvatar />
+          <UserAvatar
+            pickedImage={pickedImage}
+            pickImage={pickImage}
+            removePickedImage={removePickedImage}
+          />
           {profile && <Text style={styles.userName}>{profile.userName}</Text>}
-          <Posts />
+          <Posts isOwnPosts={true} />
         </View>
       </ImageBackground>
     </>

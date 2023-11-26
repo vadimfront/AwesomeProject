@@ -60,6 +60,7 @@ export const CommentsScreen = () => {
         />
 
         <CommentsList commentsData={commentsData} />
+
         <CommentForm postId={postId} handlerFocus={handlerFocus} />
       </View>
     </KeyboardAvoidingContainer>

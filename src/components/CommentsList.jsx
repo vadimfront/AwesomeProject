@@ -9,9 +9,10 @@ import { useSelector } from "react-redux";
 
 export const CommentsList = ({ commentsData }) => {
   const { auth } = useSelector(selectAuth);
+
   return (
     <>
-      {commentsData.length ? (
+      {commentsData.length > 0 ? (
         <FlatList
           data={commentsData}
           inverted={true}
@@ -21,9 +22,9 @@ export const CommentsList = ({ commentsData }) => {
             flexGrow: 1,
             flexDirection: "column-reverse",
           }}
+          keyExtractor={(item) => item.commentId}
           renderItem={({ item }) => (
             <View
-              key={item.commentId}
               style={[
                 styles.comment,
                 item.userId === auth && styles.commentReverse,

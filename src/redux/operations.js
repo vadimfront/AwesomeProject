@@ -7,8 +7,7 @@ import {
   updateDataInFirestore,
   writeDataToFirestore,
 } from "../firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { uploadImageToStorage, uriToBlob } from "../helpers/helpers";
+import { uploadImageToStorage } from "../helpers/helpers";
 import { avatarPlaceholder } from "../constants/constants";
 
 export const signUp = createAsyncThunk(
@@ -16,29 +15,21 @@ export const signUp = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       const { email, password, userName, userProfileImage } = data;
+
       const userAvatarUri = userProfileImage || avatarPlaceholder;
 
       const userId = await registerDB({ email, password });
 
       if (!userId) return;
 
-      const storage = getStorage();
-
-      const blobFile = await uriToBlob(userAvatarUri);
-      if (blobFile.size > 1000000) {
-        console.log("size more then 1mb");
-        return;
-      }
-
-      const metadata = {
-        contentType: "image/jpg",
+      const imageParams = {
+        imageId: userId,
+        imageUrl: userAvatarUri,
+        imageName: "profile",
+        folderName: "users",
       };
 
-      const storageRef = ref(storage, "users/" + userId + "/profile.jpg");
-
-      await uploadBytes(storageRef, blobFile, metadata);
-
-      const downloadURL = await getDownloadURL(storageRef);
+      const downloadURL = await uploadImageToStorage({ ...imageParams });
 
       const fireStoreData = {
         userId: userId,
@@ -111,22 +102,9 @@ export const updateProfileImage = createAsyncThunk(
   }
 );
 
-export const fetchPosts = createAsyncThunk("posts/fetchAllPosts", async () => {
-  try {
-    const postsData = await fetchAllDataFirestore("posts");
-
-    if (!postsData) return;
-
-    return postsData;
-  } catch (error) {
-    return rejectWithValue(error.code);
-  }
-});
-
 export const updateLike = createAsyncThunk(
   "posts/updateLike",
   async ({ postId, newArrLikes }, { rejectWithValue }) => {
-    console.log("else", postId, newArrLikes);
     try {
       await updateDataInFirestore("posts", "id", "likes", postId, newArrLikes);
     } catch (error) {
@@ -139,8 +117,6 @@ export const createPostComment = createAsyncThunk(
   "posts/createPostComment",
   async ({ postId, commentData }, { rejectWithValue }) => {
     try {
-      console.log(postId, commentData);
-
       commentData[0].commentId = `comment_${nanoid()}`;
 
       await updateDataInFirestore(

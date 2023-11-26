@@ -8,6 +8,7 @@ import {
   doc,
   onSnapshot,
   orderBy,
+  limit,
 } from "firebase/firestore";
 import { db } from "./config";
 
@@ -94,10 +95,10 @@ export const fetchSingleFirestore = async (
   }
 };
 
-export const fetchAllDataFirestore = async (collectionName) => {
+export const fetchAllDataFirestore = async (collectionName, dataLimit = 2) => {
   try {
     const collectionRef = collection(db, collectionName);
-    const q = query(collectionRef, orderBy("date", "desc"));
+    const q = query(collectionRef, orderBy("date", "desc"), limit(dataLimit));
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.size) return;
 
@@ -109,9 +110,19 @@ export const fetchAllDataFirestore = async (collectionName) => {
   }
 };
 
-export const subscribeToFirestoreCollection = (collectionName, callback) => {
+export const subscribeToFirestoreCollection = (
+  collectionName,
+  callback,
+  //dataLimit = 12,
+  { fieldName, value }
+) => {
   const collectionRef = collection(db, collectionName);
-  const q = query(collectionRef, orderBy("date", "desc"));
+  const q = query(
+    collectionRef,
+    fieldName && value && where(fieldName, "==", value),
+    orderBy("date", "desc")
+    // limit(dataLimit)
+  );
 
   return onSnapshot(q, (querySnapshot) => {
     const updatedPosts = [];

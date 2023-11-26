@@ -22,7 +22,7 @@ export const useLocation = () => {
   const getLocationFromAddress = async (address) => {
     try {
       setCoordsLoading(true);
-      console.log(address);
+
       const location = await Location.geocodeAsync(address);
       if (location.length > 0) {
         const { latitude, longitude } = location[0];

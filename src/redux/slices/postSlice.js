@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createPost, fetchPosts, updateLike } from "../operations";
+import { createPost, updateLike } from "../operations";
 
 const initialState = {
   posts: [],
+  ownPosts: [],
   loading: false,
   error: false,
 };
@@ -12,7 +13,12 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     implamentChanges: (state, { payload }) => {
-      state.posts = payload;
+      const { data, isOwnPosts } = payload;
+      if (isOwnPosts) {
+        state.ownPosts = data;
+      } else {
+        state.posts = data;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -29,20 +35,7 @@ const postsSlice = createSlice({
       state.loading = false;
       state.error = payload;
     });
-    builder.addCase(fetchPosts.pending, (state) => {
-      state.loading = true;
-      state.error = false;
-    });
-    builder.addCase(fetchPosts.fulfilled, (state, { payload }) => {
-      state.loading = false;
-      state.error = false;
-      state.posts = payload;
-    });
-    builder.addCase(fetchPosts.rejected, (state, { payload }) => {
-      state.loading = false;
-      state.error = payload;
-      state.posts = [];
-    });
+
     builder.addCase(updateLike.pending, (state) => {
       state.error = false;
     });

@@ -9,26 +9,33 @@ import LocationModule from "./LocationModule";
 import { useDispatch, useSelector } from "react-redux";
 import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
 import { useEffect } from "react";
-import { fetchPosts } from "../redux/operations";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { colors } from "../constants/colors";
 import { subscribeToFirestoreCollection } from "../firebase/firestore";
 import { implamentChanges } from "../redux/slices/postSlice";
 
-const Posts = () => {
+const Posts = ({ isOwnPosts = false }) => {
+  // const [pageLimit, setPageLimit] = useState(2);
   const dispatch = useDispatch();
-  const { posts, loading } = useSelector(selectPosts);
+  const { posts, ownPosts, loading } = useSelector(selectPosts);
   const { auth } = useSelector(selectAuth);
 
   useEffect(() => {
-    dispatch(fetchPosts());
-  }, []);
-
-  useEffect(() => {
     const updateFunc = (data) => {
-      dispatch(implamentChanges(data));
+      dispatch(implamentChanges({ data, isOwnPosts }));
     };
-    const unsubscribe = subscribeToFirestoreCollection("posts", updateFunc);
+
+    const params = {
+      fieldName: "author.id",
+      value: auth,
+    };
+
+    const unsubscribe = subscribeToFirestoreCollection(
+      "posts",
+      updateFunc,
+      //pageLimit,
+      isOwnPosts === true && { ...params }
+    );
 
     return () => {
       unsubscribe();
@@ -37,11 +44,11 @@ const Posts = () => {
 
   return (
     <>
-      {posts ? (
+      {(isOwnPosts && ownPosts.length) || (!isOwnPosts && posts.length) ? (
         <FlatList
-          data={posts}
+          data={isOwnPosts ? ownPosts : posts}
           showsVerticalScrollIndicator={false}
-          //keyExtractor={(item) => }
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const {
               id,
@@ -54,7 +61,7 @@ const Posts = () => {
               date,
             } = item;
             return (
-              <View style={styles.postWrap} key={id}>
+              <View style={styles.postWrap}>
                 <View style={styles.authorWrap}>
                   <View style={styles.authorInfo}>
                     <Text>{author.name}</Text>

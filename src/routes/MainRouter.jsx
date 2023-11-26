@@ -14,7 +14,10 @@ const MainRouter = () => {
 
   return (
     <NavigationContainer>
-      <MainStack.Navigator screenOptions={{ gestureEnabled: false }}>
+      <MainStack.Navigator
+        initialRouteName="Login"
+        screenOptions={{ gestureEnabled: false }}
+      >
         <MainStack.Screen
           name="Registration"
           component={RegistrationScreen}

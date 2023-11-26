@@ -21,7 +21,7 @@ const LikeModule = ({ likes, postId, userId }) => {
   return (
     <ButtonIcon
       iconName="thumbs-up"
-      color={likes.length ? colors.activeColor : colors.iconColor}
+      color={likes.includes(userId) ? colors.activeColor : colors.iconColor}
       onPressHandler={() => handleLike()}
       style={styles.likeModule}
     >

@@ -3,7 +3,7 @@ import { Image, StyleSheet, TouchableOpacity, View, Text } from "react-native";
 import { EvilIcons } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import { fontSizes } from "../constants/fontSizes";
-import { usePickImage } from "../hooks/usePickImage";
+
 import { avatarPlaceholder } from "../constants/constants";
 import { selectAuth } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,10 +11,9 @@ import { useEffect } from "react";
 import { updateProfileImage } from "../redux/operations";
 import { LoadingSpinner } from "./LoadingSpinner";
 
-export const UserAvatar = () => {
+export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
   const { profile, loading, auth } = useSelector(selectAuth);
   const dispatch = useDispatch();
-  const { pickImage, pickedImage, removePickedImage } = usePickImage();
 
   const imageSrc = profile ? profile.userProfileImage.url : pickedImage;
 
