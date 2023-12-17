@@ -42,8 +42,6 @@ export const RegistrationForm = () => {
       userProfileImage: pickedImage,
       userName: login,
     };
-
-    console.log(data);
     dispatch(signUp(data));
   };
 

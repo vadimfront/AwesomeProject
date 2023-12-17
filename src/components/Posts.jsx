@@ -44,7 +44,7 @@ const Posts = ({ isOwnPosts = false }) => {
 
   return (
     <>
-      {(isOwnPosts && ownPosts.length) || (!isOwnPosts && posts.length) ? (
+      {(isOwnPosts ? ownPosts : posts)?.length > 0 ? (
         <FlatList
           data={isOwnPosts ? ownPosts : posts}
           showsVerticalScrollIndicator={false}
@@ -64,7 +64,7 @@ const Posts = ({ isOwnPosts = false }) => {
               <View style={styles.postWrap}>
                 <View style={styles.authorWrap}>
                   <View style={styles.authorInfo}>
-                    <Text>{author.name}</Text>
+                    <Text>{author?.name}</Text>
                     <Text>{date}</Text>
                   </View>
                   <Image style={styles.authorPhoto} src={author.photo} />

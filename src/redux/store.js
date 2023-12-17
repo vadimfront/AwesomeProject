@@ -14,18 +14,24 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usersReducer } from "./slices/usersSlice";
 import { postsReducer } from "./slices/postSlice";
 
-const persistConfig = {
+const rootPersistConfig = {
   key: "root",
   storage: AsyncStorage,
   whitelist: ["posts"],
 };
 
-const reducers = combineReducers({
-  users: usersReducer,
+const userPersistConfig = {
+  key: "user",
+  storage: AsyncStorage,
+  whitelist: ["auth", "profile"],
+};
+
+const rootReducer = combineReducers({
+  user: persistReducer(userPersistConfig, usersReducer),
   posts: postsReducer,
 });
 
-const reducer = persistReducer(persistConfig, reducers);
+const reducer = persistReducer(rootPersistConfig, rootReducer);
 
 const store = configureStore({
   reducer,
@@ -38,5 +44,14 @@ const store = configureStore({
 });
 
 const persistor = persistStore(store);
+
+// AsyncStorage.getItem("posts", (err, result) => {
+//   if (!err) {
+//     const userData = JSON.parse(result);
+//     console.log("User Data:", userData);
+//   } else {
+//     console.error("Error reading user data from AsyncStorage:", err);
+//   }
+// });
 
 export default { store, persistor };

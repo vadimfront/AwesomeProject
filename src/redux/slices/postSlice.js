@@ -14,9 +14,10 @@ const postsSlice = createSlice({
   reducers: {
     implamentChanges: (state, { payload }) => {
       const { data, isOwnPosts } = payload;
-      if (isOwnPosts) {
+
+      if (isOwnPosts && data) {
         state.ownPosts = data;
-      } else {
+      } else if (!isOwnPosts && data) {
         state.posts = data;
       }
     },

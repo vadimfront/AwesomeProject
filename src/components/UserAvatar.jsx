@@ -5,14 +5,15 @@ import { colors } from "../constants/colors";
 import { fontSizes } from "../constants/fontSizes";
 
 import { avatarPlaceholder } from "../constants/constants";
-import { selectAuth } from "../redux/selectors/userSelectors";
+import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { updateProfileImage } from "../redux/operations";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
-  const { profile, loading, auth } = useSelector(selectAuth);
+  const { profile, loading, auth, error } = useSelector(selectAuth);
+  const { ownPosts } = useSelector(selectPosts);
   const dispatch = useDispatch();
 
   const imageSrc = profile ? profile.userProfileImage.url : pickedImage;
@@ -20,9 +21,10 @@ export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
   useEffect(() => {
     if (auth && pickedImage) {
       const dataToUpdate = {
-        docId: auth,
         userProfileImage: { type: "own", url: pickedImage },
+        userId: auth,
       };
+
       dispatch(updateProfileImage(dataToUpdate));
     }
   }, [pickedImage]);
@@ -30,7 +32,7 @@ export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
   const removeProfileImage = () => {
     const dataToUpdate = {
       collectionName: "users",
-      docId: auth,
+      userId: auth,
       userProfileImage: { type: "default", url: avatarPlaceholder },
     };
     removePickedImage();

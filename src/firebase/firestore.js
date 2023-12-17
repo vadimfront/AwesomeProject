@@ -22,7 +22,6 @@ export const writeDataToFirestore = async (dbName, data) => {
     throw e;
   }
 };
-
 export const replaceDataInFirestore = async (
   collectionName,
   fieldName,
@@ -56,10 +55,10 @@ export const updateDataInFirestore = async (
 ) => {
   try {
     if (!value) throw new Error("Data is missing");
-    console.log(collectionName, fieldName, updateAt, equalValue, value);
+
     const q = query(
       collection(db, collectionName),
-      where(fieldName, "==", equalValue)
+      equalValue && where(fieldName, "==", equalValue)
     );
 
     const querySnapshot = await getDocs(q);
@@ -68,7 +67,7 @@ export const updateDataInFirestore = async (
     const docRef = doc(db, collectionName, currentDoc.id);
     if (!docRef) throw new Error("Error! User not exist");
     await updateDoc(docRef, {
-      [updateAt]: [...value],
+      [updateAt]: value,
     });
   } catch (error) {
     throw error;

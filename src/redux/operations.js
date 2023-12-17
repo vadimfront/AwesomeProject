@@ -80,7 +80,7 @@ export const updateProfileImage = createAsyncThunk(
       if (!data) throw new Error("data is undefined");
 
       const imageParams = {
-        imageId: data.docId,
+        imageId: nanoid(),
         imageUrl: data.userProfileImage.url,
         imageName: "profile",
         folderName: "users",
@@ -90,13 +90,22 @@ export const updateProfileImage = createAsyncThunk(
 
       const params = {
         userProfileImage: {
-          type: String(data.userProfileImage.type),
+          type: data.userProfileImage.type,
           url: downloadURL,
         },
       };
-      await replaceDataInFirestore("users", "userId", data.docId, params);
+
+      await replaceDataInFirestore("users", "userId", data.userId, params);
+      await updateDataInFirestore(
+        "posts",
+        "author.id",
+        "author.photo",
+        data.userId,
+        params.userProfileImage.url
+      );
       return params;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -108,6 +117,7 @@ export const updateLike = createAsyncThunk(
     try {
       await updateDataInFirestore("posts", "id", "likes", postId, newArrLikes);
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -127,6 +137,7 @@ export const createPostComment = createAsyncThunk(
         commentData
       );
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -161,7 +172,32 @@ export const createPost = createAsyncThunk(
 
       return postsData;
     } catch (error) {
+      console.log(error);
       return rejectWithValue(error.code);
     }
   }
 );
+
+// export const updatePostsAuhtor = createAsyncThunk(
+//   "posts/updatePostsAuthor",
+//   async ({ updatedData, userId }, { rejectWithValue }) => {
+//     try {
+//       // collectionName,
+//       // fieldName,
+//       // updateAt,
+//       // equalValue,
+//       // value
+
+//       await updateDataInFirestore(
+//         "posts",
+//         "author.id",
+//         "photo",
+//         userId,
+//         updatedData
+//       );
+//     } catch (error) {
+//       console.log("errorrrr", error);
+//       return rejectWithValue(error.code);
+//     }
+//   }
+// );
