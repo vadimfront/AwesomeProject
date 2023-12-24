@@ -1,7 +1,8 @@
 import { createAsyncThunk, nanoid } from "@reduxjs/toolkit";
 import { loginDB, registerDB } from "../firebase/auth";
 import {
-  fetchAllDataFirestore,
+  fetchData,
+  fetchMoreData,
   fetchSingleFirestore,
   replaceDataInFirestore,
   updateDataInFirestore,
@@ -34,7 +35,10 @@ export const signUp = createAsyncThunk(
       const fireStoreData = {
         userId: userId,
         userName: userName,
-        userProfileImage: { type: "default", url: downloadURL },
+        userProfileImage: {
+          type: userProfileImage ? "own" : "default",
+          url: downloadURL,
+        },
         email: email,
       };
 
@@ -78,10 +82,15 @@ export const updateProfileImage = createAsyncThunk(
   async (data, { rejectWithValue }) => {
     try {
       if (!data) throw new Error("data is undefined");
+      const {
+        userProfileImage: { url, type },
+        userId,
+        hasPosts,
+      } = data;
 
       const imageParams = {
         imageId: nanoid(),
-        imageUrl: data.userProfileImage.url,
+        imageUrl: url,
         imageName: "profile",
         folderName: "users",
       };
@@ -90,19 +99,21 @@ export const updateProfileImage = createAsyncThunk(
 
       const params = {
         userProfileImage: {
-          type: data.userProfileImage.type,
+          type: type,
           url: downloadURL,
         },
       };
 
-      await replaceDataInFirestore("users", "userId", data.userId, params);
-      await updateDataInFirestore(
-        "posts",
-        "author.id",
-        "author.photo",
-        data.userId,
-        params.userProfileImage.url
-      );
+      await replaceDataInFirestore("users", "userId", userId, params);
+      if (hasPosts) {
+        await updateDataInFirestore(
+          "posts",
+          "author.id",
+          "author.photo",
+          userId,
+          url
+        );
+      }
       return params;
     } catch (error) {
       console.log(error);
@@ -112,10 +123,36 @@ export const updateProfileImage = createAsyncThunk(
 );
 
 export const updateLike = createAsyncThunk(
-  "posts/updateLike",
+  "likes/updateLike",
   async ({ postId, newArrLikes }, { rejectWithValue }) => {
     try {
       await updateDataInFirestore("posts", "id", "likes", postId, newArrLikes);
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.code);
+    }
+  }
+);
+
+export const fatchPosts = createAsyncThunk(
+  "posts/fatchPosts",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await fetchData(params);
+      return response;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.code);
+    }
+  }
+);
+
+export const fatchMorePosts = createAsyncThunk(
+  "posts/fatchMorePosts",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await fetchMoreData(params);
+      return response;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.code);
@@ -146,6 +183,7 @@ export const createPostComment = createAsyncThunk(
 export const createPost = createAsyncThunk(
   "posts/createPost",
   async (data, { rejectWithValue }) => {
+    console.log("data", data);
     try {
       const imageParams = {
         imageId: nanoid(),
@@ -166,7 +204,7 @@ export const createPost = createAsyncThunk(
 
       await writeDataToFirestore("posts", postData);
 
-      const postsData = await fetchAllDataFirestore("posts");
+      const postsData = await fetchData("posts");
 
       if (!postsData) return;
 

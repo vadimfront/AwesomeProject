@@ -1,19 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 import { StyleSheet, Text } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateLike } from "../redux/operations";
+import { selectLikeStatus } from "../redux/selectors/userSelectors";
 
 const LikeModule = ({ likes, postId, userId }) => {
+  const [totalLikes, setTotalLikes] = useState(likes);
+  const { status } = useSelector(selectLikeStatus);
   const dispatch = useDispatch();
 
   const handleLike = () => {
-    if (likes.includes(userId)) {
-      const newArrLikes = likes.filter((like) => like !== userId);
+    if (totalLikes.includes(userId)) {
+      const newArrLikes = totalLikes.filter((like) => like !== userId);
+      setTotalLikes(newArrLikes);
       dispatch(updateLike({ postId, newArrLikes }));
     } else {
-      const newArrLikes = [...likes, userId];
+      const newArrLikes = [...totalLikes, userId];
+      setTotalLikes(newArrLikes);
       dispatch(updateLike({ postId, newArrLikes }));
     }
   };
@@ -21,16 +26,19 @@ const LikeModule = ({ likes, postId, userId }) => {
   return (
     <ButtonIcon
       iconName="thumbs-up"
-      color={likes.includes(userId) ? colors.activeColor : colors.iconColor}
+      disabled={status === "loading" ? true : false}
+      color={
+        totalLikes.includes(userId) ? colors.activeColor : colors.iconColor
+      }
       onPressHandler={() => handleLike()}
       style={styles.likeModule}
     >
       <Text
         style={{
-          color: likes.length ? colors.baseTextColor : colors.iconColor,
+          color: totalLikes.length ? colors.baseTextColor : colors.iconColor,
         }}
       >
-        {likes.length > 0 && likes.length}
+        {totalLikes.length > 0 && totalLikes.length}
       </Text>
     </ButtonIcon>
   );

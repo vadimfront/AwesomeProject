@@ -61,6 +61,7 @@ const TabsRouter = () => {
               navigateTo="Login"
             />
           ),
+          unmountOnBlur: true,
         }}
       />
       <Tabs.Screen
@@ -90,7 +91,7 @@ const TabsRouter = () => {
       <Tabs.Screen
         name="ProfileScreen"
         component={ProfileScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, unmountOnBlur: true }}
       />
     </Tabs.Navigator>
   );

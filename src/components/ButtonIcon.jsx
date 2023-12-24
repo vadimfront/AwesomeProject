@@ -7,11 +7,12 @@ export const ButtonIcon = ({
   size = 24,
   color = "#000",
   onPressHandler,
+  disabled,
   children,
   ...props
 }) => {
   return (
-    <TouchableOpacity onPress={onPressHandler} {...props}>
+    <TouchableOpacity onPress={onPressHandler} {...props} disabled={disabled}>
       <Feather name={iconName} size={size} color={color} />
       {children}
     </TouchableOpacity>

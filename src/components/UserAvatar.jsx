@@ -14,30 +14,41 @@ import { LoadingSpinner } from "./LoadingSpinner";
 export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
   const { profile, loading, auth, error } = useSelector(selectAuth);
   const { ownPosts } = useSelector(selectPosts);
+
   const dispatch = useDispatch();
 
-  const imageSrc = profile ? profile.userProfileImage.url : pickedImage;
+  console.log(pickedImage);
+
+  const {
+    userProfileImage: { type, url },
+  } = profile;
 
   useEffect(() => {
-    if (auth && pickedImage) {
-      const dataToUpdate = {
+    if (auth && type === "default" && pickedImage) {
+      const updatedData = {
+        collectionName: "users",
         userProfileImage: { type: "own", url: pickedImage },
         userId: auth,
+        hasPosts: ownPosts.length ? true : false,
       };
-
-      dispatch(updateProfileImage(dataToUpdate));
+      dispatch(updateProfileImage(updatedData));
     }
   }, [pickedImage]);
 
   const removeProfileImage = () => {
-    const dataToUpdate = {
-      collectionName: "users",
-      userId: auth,
-      userProfileImage: { type: "default", url: avatarPlaceholder },
-    };
+    if (auth) {
+      const updatedData = {
+        collectionName: "users",
+        userId: auth,
+        userProfileImage: { type: "default", url: avatarPlaceholder },
+        hasPosts: ownPosts.length ? true : false,
+      };
+      dispatch(updateProfileImage(updatedData));
+    }
     removePickedImage();
-    dispatch(updateProfileImage(dataToUpdate));
   };
+
+  const imageSrc = url ? url : pickedImage;
 
   return (
     <>
@@ -51,7 +62,7 @@ export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
           />
         )}
         <View style={styles.addAvatar}>
-          {profile?.type === "default" || !pickedImage ? (
+          {type === "default" && !pickedImage ? (
             <TouchableOpacity onPress={pickImage}>
               <EvilIcons name="plus" size={30} color={colors.avatarIcon} />
             </TouchableOpacity>

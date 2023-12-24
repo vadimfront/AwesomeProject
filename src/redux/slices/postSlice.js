@@ -1,9 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createPost, updateLike } from "../operations";
+import { createPost, fatchMorePosts, fatchPosts } from "../operations";
 
 const initialState = {
   posts: [],
   ownPosts: [],
+  lastVisible: null,
+  isLastPost: false,
   loading: false,
   error: false,
 };
@@ -12,14 +14,11 @@ const postsSlice = createSlice({
   name: "posts",
   initialState,
   reducers: {
-    implamentChanges: (state, { payload }) => {
-      const { data, isOwnPosts } = payload;
-
-      if (isOwnPosts && data) {
-        state.ownPosts = data;
-      } else if (!isOwnPosts && data) {
-        state.posts = data;
-      }
+    cleanPosts: (state) => {
+      state.posts = initialState.posts;
+      state.ownPosts = initialState.ownPosts;
+      state.lastVisible = initialState.lastVisible;
+      state.isLastPost = initialState.isLastPost;
     },
   },
   extraReducers: (builder) => {
@@ -29,25 +28,47 @@ const postsSlice = createSlice({
     });
     builder.addCase(createPost.fulfilled, (state, { payload }) => {
       state.loading = false;
-      state.error = false;
       state.posts = payload;
+      state.isLastPost = false;
     });
     builder.addCase(createPost.rejected, (state, { payload }) => {
       state.loading = false;
+    });
+    /// Fetch posts
+    builder.addCase(fatchPosts.pending, (state) => {
+      state.loading = true;
+      state.error = false;
+    });
+    builder.addCase(fatchPosts.fulfilled, (state, { payload }) => {
+      state.loading = false;
+      state.lastVisible = payload.lastVisible;
+      if (payload.type === "default") {
+        state.posts = payload.documents;
+      } else if (payload.type === "own") {
+        state.ownPosts = payload.documents;
+      }
+    });
+    builder.addCase(fatchPosts.rejected, (state, { payload }) => {
       state.error = payload;
     });
-
-    builder.addCase(updateLike.pending, (state) => {
+    /// Fetch more
+    builder.addCase(fatchMorePosts.pending, (state) => {
       state.error = false;
     });
-    builder.addCase(updateLike.fulfilled, (state, { payload }) => {
-      state.error = false;
+    builder.addCase(fatchMorePosts.fulfilled, (state, { payload }) => {
+      state.lastVisible = payload.lastVisible;
+      state.isLastPost = payload.isLastPost;
+      if (payload.type === "default" && payload.documents.length > 0) {
+        state.posts.push(...payload.documents);
+      } else if (payload.type === "own" && payload.documents.length > 0) {
+        state.ownPosts.push(...payload.documents);
+      }
     });
-    builder.addCase(updateLike.rejected, (state, { payload }) => {
+    builder.addCase(fatchMorePosts.rejected, (state, { payload }) => {
       state.error = payload;
     });
   },
 });
 
 export const postsReducer = postsSlice.reducer;
-export const { implamentChanges, changeLikes } = postsSlice.actions;
+export const { cleanPosts, changeLikes } = postsSlice.actions;

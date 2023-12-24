@@ -14,8 +14,11 @@ export const CommentsScreen = () => {
     params: { postId },
   } = useRoute();
 
-  const { posts } = useSelector(selectPosts);
+  const { posts, ownPosts } = useSelector(selectPosts);
   const [fixed, setFixed] = useState(false);
+
+  const postsData = posts.length ? posts : ownPosts;
+  console.log("postsData", postsData);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -45,8 +48,9 @@ export const CommentsScreen = () => {
 
   const imageStyle = fixed ? styles.fixedPostImg : styles.postImg;
 
-  const index = posts.findIndex((post) => post.id === postId);
-  const commentsData = posts[index]?.comments;
+  const index = postsData.findIndex((post) => post.id === postId);
+  const commentsData = postsData[index]?.comments;
+
   return (
     <KeyboardAvoidingContainer
       offsetAndroid={90}
@@ -55,7 +59,7 @@ export const CommentsScreen = () => {
     >
       <View style={styles.container}>
         <Animated.Image
-          src={posts[index]?.postImage}
+          src={postsData[index]?.postImage}
           style={[imageStyle, { opacity: fadeAnim }]}
         />
 

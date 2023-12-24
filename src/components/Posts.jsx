@@ -6,49 +6,45 @@ import { fontSizes } from "../constants/fontSizes";
 import LikeModule from "./LikeModule";
 import CommentModule from "./CommentModule";
 import LocationModule from "./LocationModule";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
-import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { selectAuth } from "../redux/selectors/userSelectors";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { colors } from "../constants/colors";
-import { subscribeToFirestoreCollection } from "../firebase/firestore";
-import { implamentChanges } from "../redux/slices/postSlice";
 
-const Posts = ({ isOwnPosts = false }) => {
-  // const [pageLimit, setPageLimit] = useState(2);
-  const dispatch = useDispatch();
-  const { posts, ownPosts, loading } = useSelector(selectPosts);
+const Posts = ({ posts, loading, fetchMore }) => {
   const { auth } = useSelector(selectAuth);
 
-  useEffect(() => {
-    const updateFunc = (data) => {
-      dispatch(implamentChanges({ data, isOwnPosts }));
-    };
+  // useEffect(() => {
+  //   const updateFunc = (data) => {
+  //     dispatch(implamentChanges({ data, isOwnPosts }));
+  //   };
 
-    const params = {
-      fieldName: "author.id",
-      value: auth,
-    };
+  //   const params = {
+  //     fieldName: "author.id",
+  //     value: auth,
+  //   };
 
-    const unsubscribe = subscribeToFirestoreCollection(
-      "posts",
-      updateFunc,
-      //pageLimit,
-      isOwnPosts === true && { ...params }
-    );
+  //   const unsubscribe = subscribeToFirestoreCollection(
+  //     "posts",
+  //     updateFunc,
+  //     //pageLimit,
+  //     isOwnPosts === true && { ...params }
+  //   );
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   return (
     <>
-      {(isOwnPosts ? ownPosts : posts)?.length > 0 ? (
+      {posts && posts?.length > 0 ? (
         <FlatList
-          data={isOwnPosts ? ownPosts : posts}
+          data={posts}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
+          onEndReached={fetchMore}
+          onEndReachedThreshold={0.1}
           renderItem={({ item }) => {
             const {
               id,
@@ -67,6 +63,7 @@ const Posts = ({ isOwnPosts = false }) => {
                     <Text>{author?.name}</Text>
                     <Text>{date}</Text>
                   </View>
+
                   <Image style={styles.authorPhoto} src={author.photo} />
                 </View>
                 <Image src={postImage} style={styles.postImg} />

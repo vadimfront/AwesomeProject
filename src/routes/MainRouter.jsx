@@ -38,12 +38,12 @@ const MainRouter = () => {
         <MainStack.Screen
           name="Comments"
           component={CommentsScreen}
-          options={{
+          options={({ navigation }) => ({
             headerLeft: () => (
               <ButtonNavigationIcon
                 iconName="arrow-left"
                 color={colors.iconColor}
-                navigateTo="ProfileScreen"
+                type="goBack"
               />
             ),
             headerTitle: "Коментарі",
@@ -51,7 +51,7 @@ const MainRouter = () => {
               paddingLeft: 16,
             },
             headerTitleAlign: "center",
-          }}
+          })}
         />
         <MainStack.Screen
           name="Map"

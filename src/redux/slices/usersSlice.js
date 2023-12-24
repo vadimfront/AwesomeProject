@@ -1,9 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { login, signUp, updateProfileImage } from "../operations";
+import { avatarPlaceholder } from "../../constants/constants";
 
 const initialState = {
   auth: null,
-  profile: null,
+  profile: {
+    email: null,
+    userId: null,
+    userName: null,
+    userProfileImage: {
+      type: "default",
+      url: avatarPlaceholder,
+    },
+  },
   loading: false,
   error: false,
   errorMessage: null,
@@ -14,10 +23,8 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     logOut: (state) => {
-      state.errorMessage = null;
-      state.auth = null;
-      state.profile = null;
-      state.loading = false;
+      state.auth = initialState.auth;
+      state.profile = initialState.profile;
     },
     resetError: (state) => {
       state.errorMessage = null;
@@ -42,13 +49,13 @@ const usersSlice = createSlice({
     });
 
     builder.addCase(login.pending, (state) => {
+      state.error = null;
       state.loading = true;
+      state.errorMessage = null;
     });
     builder.addCase(login.fulfilled, (state, { payload }) => {
       const { userId, email, userName, userProfileImage } = payload;
       state.loading = false;
-      state.error = null;
-      state.errorMessage = null;
       state.auth = userId;
       state.profile = { email, userName, userProfileImage };
     });

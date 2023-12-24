@@ -39,7 +39,6 @@ export const CommentForm = ({ postId, handlerFocus }) => {
       initialValues={{ comment: "" }}
       onSubmit={({ comment }, { resetForm }) => {
         createPostHendler({ comment, resetForm });
-        //resetForm();
       }}
     >
       {({ handleChange, handleSubmit, values }) => (

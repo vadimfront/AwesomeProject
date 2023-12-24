@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import bg from "../assets/images/RegistrationScreenBg.jpg";
 import { ImageBackground, Text, StyleSheet, View } from "react-native";
 import { UserAvatar } from "../components/UserAvatar";
@@ -6,13 +6,45 @@ import Posts from "../components/Posts";
 import { ButtonNavigationIcon } from "../components/ButtonNavigationIcon";
 import { colors } from "../constants/colors";
 import { fontSizes } from "../constants/fontSizes";
-import { selectAuth } from "../redux/selectors/userSelectors";
-import { useSelector } from "react-redux";
+import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
+import { useDispatch, useSelector } from "react-redux";
 import { usePickImage } from "../hooks/usePickImage";
+import { fatchMorePosts, fatchPosts } from "../redux/operations";
+import { cleanPosts } from "../redux/slices/postSlice";
 
 export const ProfileScreen = () => {
-  const { profile } = useSelector(selectAuth);
+  const { profile, auth } = useSelector(selectAuth);
+  const { ownPosts, lastVisible, isLastPost, loading } =
+    useSelector(selectPosts);
   const { pickImage, pickedImage, removePickedImage } = usePickImage();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    console.log("profile");
+    dispatch(cleanPosts());
+    dispatch(
+      fatchPosts({
+        collectionName: "posts",
+        type: "own",
+        fieldName: "author.id",
+        equalToFieldName: auth,
+      })
+    );
+  }, [profile]);
+
+  const fetchMoreHandler = () => {
+    if (!loading && !isLastPost) {
+      dispatch(
+        fatchMorePosts({
+          collectionName: "posts",
+          type: "own",
+          fieldName: "author.id",
+          equalToFieldName: auth,
+          lastVisible: lastVisible,
+        })
+      );
+    }
+  };
 
   return (
     <>
@@ -32,7 +64,11 @@ export const ProfileScreen = () => {
             removePickedImage={removePickedImage}
           />
           {profile && <Text style={styles.userName}>{profile.userName}</Text>}
-          <Posts isOwnPosts={true} />
+          <Posts
+            posts={ownPosts}
+            loading={loading}
+            fetchMore={fetchMoreHandler}
+          />
         </View>
       </ImageBackground>
     </>

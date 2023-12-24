@@ -12,7 +12,7 @@ export const CommentsList = ({ commentsData }) => {
 
   return (
     <>
-      {commentsData.length > 0 ? (
+      {commentsData && commentsData.length > 0 ? (
         <FlatList
           data={commentsData}
           inverted={true}

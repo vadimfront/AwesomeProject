@@ -9,8 +9,11 @@ import {
   onSnapshot,
   orderBy,
   limit,
+  startAfter,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "./config";
+import { DATA_LIMIT } from "../constants/constants";
 
 export const writeDataToFirestore = async (dbName, data) => {
   try {
@@ -56,20 +59,27 @@ export const updateDataInFirestore = async (
   try {
     if (!value) throw new Error("Data is missing");
 
+    const batch = writeBatch(db);
+
     const q = query(
       collection(db, collectionName),
       equalValue && where(fieldName, "==", equalValue)
     );
 
     const querySnapshot = await getDocs(q);
-    if (!querySnapshot.size) throw new Error("User document not found");
-    const currentDoc = querySnapshot.docs[0];
-    const docRef = doc(db, collectionName, currentDoc.id);
-    if (!docRef) throw new Error("Error! User not exist");
-    await updateDoc(docRef, {
-      [updateAt]: value,
+
+    if (querySnapshot.empty) {
+      throw new Error("No documents found");
+    }
+
+    querySnapshot.forEach((docSnapshot) => {
+      const docRef = doc(db, collectionName, docSnapshot.id);
+      batch.update(docRef, { [updateAt]: value });
     });
+
+    await batch.commit();
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
@@ -91,6 +101,93 @@ export const fetchSingleFirestore = async (
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;
+  }
+};
+
+export const fetchData = async ({
+  collectionName,
+  type,
+  fieldName,
+  equalToFieldName,
+}) => {
+  try {
+    const collectionRef = collection(db, collectionName);
+
+    const whereProps =
+      fieldName && equalToFieldName
+        ? [where(fieldName, "==", equalToFieldName)]
+        : [];
+    const q = query(
+      collectionRef,
+      orderBy("date", "desc"),
+      limit(DATA_LIMIT),
+      ...whereProps
+    );
+    const documentSnapshots = await getDocs(q);
+    if (documentSnapshots.empty) {
+      return {
+        documents: [],
+        lastVisible: null,
+        type: type,
+      };
+    }
+    const lastVisible =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1].data().date;
+
+    return {
+      documents: documentSnapshots.docs.map((doc) => doc.data()),
+      lastVisible: lastVisible,
+      type: type,
+    };
+  } catch (error) {
+    console.log(error.message);
+    throw error;
+  }
+};
+
+export const fetchMoreData = async ({
+  collectionName,
+  type,
+  fieldName,
+  equalToFieldName,
+  lastVisible,
+}) => {
+  try {
+    const collectionRef = collection(db, collectionName);
+    const whereProps =
+      fieldName && equalToFieldName
+        ? [where(fieldName, "==", equalToFieldName)]
+        : [];
+    const q = query(
+      collectionRef,
+      orderBy("date", "desc"),
+      startAfter(lastVisible),
+      limit(DATA_LIMIT),
+      ...whereProps
+    );
+    const documentSnapshots = await getDocs(q);
+
+    console.log(documentSnapshots.size);
+    if (!documentSnapshots.size) {
+      return {
+        documents: [],
+        isLastPost: true,
+        lastVisible: null,
+        type: type,
+      };
+    }
+
+    const data = {
+      documents: documentSnapshots.docs.map((doc) => doc.data()),
+      lastVisible:
+        documentSnapshots.docs[documentSnapshots.docs.length - 1].data().date,
+      isLastPost: false,
+      type: type,
+    };
+    return data;
+  } catch (error) {
+    console.log(error.message);
+    throw error;
   }
 };
 

@@ -4,6 +4,7 @@ import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { logOut } from "../redux/slices/usersSlice";
+import { cleanPosts } from "../redux/slices/postSlice";
 
 export const ButtonNavigationIcon = ({
   iconName,
@@ -21,6 +22,11 @@ export const ButtonNavigationIcon = ({
   const onPressButtonHandler = () => {
     if (type === "logOut") {
       dispatch(logOut());
+      dispatch(cleanPosts());
+      return;
+    } else if (type === "goBack") {
+      navigation.goBack();
+      return;
     }
     navigation.navigate(navigateTo, { ...params });
   };
