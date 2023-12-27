@@ -49,6 +49,6 @@ export const uploadImageToStorage = async ({
 
 export const getCurrentDateAndTime = () => {
   const currentDate = new Date();
-  const formattedDateTime = format(currentDate, "MMMM d, yyyy, HH:mm");
+  const formattedDateTime = format(currentDate, "MMMM d, yyyy, HH:mm:ss");
   return formattedDateTime;
 };

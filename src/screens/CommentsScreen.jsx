@@ -6,8 +6,12 @@ import { CommentsList } from "../components/CommentsList";
 import { CommentForm } from "../components/CommentForm";
 
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
-import { selectPosts } from "../redux/selectors/userSelectors";
-import { useSelector } from "react-redux";
+import {
+  selectCommentsStatus,
+  selectPosts,
+} from "../redux/selectors/userSelectors";
+import { useDispatch, useSelector } from "react-redux";
+import { fatchPosts } from "../redux/operations";
 
 export const CommentsScreen = () => {
   const {
@@ -15,10 +19,20 @@ export const CommentsScreen = () => {
   } = useRoute();
 
   const { posts, ownPosts } = useSelector(selectPosts);
+
   const [fixed, setFixed] = useState(false);
+  const dispatch = useDispatch();
 
   const postsData = posts.length ? posts : ownPosts;
-  console.log("postsData", postsData);
+
+  // useEffect(() => {
+  //   dispatch(
+  //     fatchPosts({
+  //       collectionName: "posts",
+  //       type: "default",
+  //     })
+  //   );
+  // }, [status]);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 

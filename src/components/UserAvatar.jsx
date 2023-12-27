@@ -17,8 +17,6 @@ export const UserAvatar = ({ pickImage, pickedImage, removePickedImage }) => {
 
   const dispatch = useDispatch();
 
-  console.log(pickedImage);
-
   const {
     userProfileImage: { type, url },
   } = profile;

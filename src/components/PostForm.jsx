@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import { ButtonCustom } from "./ButtonCustom";
@@ -13,8 +13,9 @@ import { UploadImage } from "./UploadImage";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { createPost } from "../redux/operations";
-import { selectAuth } from "../redux/selectors/userSelectors";
+import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
 import { getCurrentDateAndTime } from "../helpers/helpers";
+import { toastMessage } from "../helpers/toastMessage";
 
 const СreatePostSchema = Yup.object().shape({
   image: Yup.string().required("Ви не обрали зображення"),
@@ -27,9 +28,9 @@ export const PostForm = () => {
   const [image, setImage] = useState(null);
 
   const { profile, auth } = useSelector(selectAuth);
+  const { status } = useSelector(selectPosts);
 
   const formikRef = useRef(null);
-  const navigation = useNavigation();
 
   const dispatch = useDispatch();
 
@@ -77,9 +78,8 @@ export const PostForm = () => {
         innerRef={formikRef}
         validationSchema={СreatePostSchema}
         validateOnMount={true}
-        onSubmit={async (values, { resetForm }) => {
+        onSubmit={async (values) => {
           handleCreatePost(values);
-          navigation.navigate("PostsScreen");
         }}
       >
         {({
@@ -160,6 +160,7 @@ export const PostForm = () => {
                 >
                   Опубліковати
                 </ButtonCustom>
+                {status === "loading" && <ActivityIndicator />}
               </View>
             </View>
             <View style={styles.trashBtnContainer}>

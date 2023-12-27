@@ -16,6 +16,7 @@ import { db } from "./config";
 import { DATA_LIMIT } from "../constants/constants";
 
 export const writeDataToFirestore = async (dbName, data) => {
+  console.log(data);
   try {
     const docRef = await addDoc(collection(db, dbName), data);
 
@@ -25,12 +26,12 @@ export const writeDataToFirestore = async (dbName, data) => {
     throw e;
   }
 };
-export const replaceDataInFirestore = async (
+export const replaceDataInFirestore = async ({
   collectionName,
   fieldName,
   value,
-  data
-) => {
+  data,
+}) => {
   try {
     if (!data) throw new Error("Data is missing");
     const q = query(
@@ -45,17 +46,18 @@ export const replaceDataInFirestore = async (
     if (!docRef) throw new Error("Error! User not exist");
     await updateDoc(docRef, data);
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-export const updateDataInFirestore = async (
+export const updateDataInFirestore = async ({
   collectionName,
   fieldName,
   updateAt,
   equalValue,
-  value
-) => {
+  value,
+}) => {
   try {
     if (!value) throw new Error("Data is missing");
 
@@ -167,7 +169,6 @@ export const fetchMoreData = async ({
     );
     const documentSnapshots = await getDocs(q);
 
-    console.log(documentSnapshots.size);
     if (!documentSnapshots.size) {
       return {
         documents: [],

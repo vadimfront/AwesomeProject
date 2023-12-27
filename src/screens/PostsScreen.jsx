@@ -6,14 +6,18 @@ import { selectPosts } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
 
 import { fatchMorePosts, fatchPosts } from "../redux/operations";
-import { cleanPosts } from "../redux/slices/postSlice";
+import {
+  cleanPosts,
+  refreshPagination,
+  updatePostsAfterLike,
+} from "../redux/slices/postSlice";
 
 export const PostsScreen = () => {
   const dispatch = useDispatch();
   const { posts, lastVisible, isLastPost, loading } = useSelector(selectPosts);
 
   useEffect(() => {
-    dispatch(cleanPosts());
+    //dispatch(refreshPagination());
     dispatch(
       fatchPosts({
         collectionName: "posts",
@@ -34,10 +38,25 @@ export const PostsScreen = () => {
     }
   };
 
+  const likeHandler = ({ likes, postId }) => {
+    dispatch(
+      updatePostsAfterLike({
+        type: "posts",
+        likes: likes,
+        postId: postId,
+      })
+    );
+  };
+
   return (
     <View style={styles.container}>
       <UserProfile />
-      <Posts posts={posts} loading={loading} fetchMore={fetchMoreHandler} />
+      <Posts
+        posts={posts}
+        loading={loading}
+        fetchMore={fetchMoreHandler}
+        likeHandler={likeHandler}
+      />
     </View>
   );
 };

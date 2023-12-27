@@ -9,19 +9,22 @@ import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
 import { createPostComment } from "../redux/operations";
 import { getCurrentDateAndTime } from "../helpers/helpers";
+import { nanoid } from "@reduxjs/toolkit";
 
 export const CommentForm = ({ postId, handlerFocus }) => {
   const dispatch = useDispatch();
 
-  const { posts } = useSelector(selectPosts);
+  const { posts, ownPosts } = useSelector(selectPosts);
   const { profile, auth } = useSelector(selectAuth);
 
-  const currentPostIndex = posts.findIndex((post) => post.id === postId);
+  const postsData = posts.length ? posts : ownPosts;
+  const currentPostIndex = postsData.findIndex((post) => post.id === postId);
 
   const createPostHendler = ({ comment, resetForm }) => {
     const commentData = [
-      ...posts[currentPostIndex].comments,
+      ...postsData[currentPostIndex].comments,
       {
+        id: nanoid(),
         userId: auth,
         ...profile,
         comment,

@@ -80,6 +80,7 @@ export const login = createAsyncThunk(
 export const updateProfileImage = createAsyncThunk(
   "users/update",
   async (data, { rejectWithValue }) => {
+    console.log("data", data);
     try {
       if (!data) throw new Error("data is undefined");
       const {
@@ -104,15 +105,20 @@ export const updateProfileImage = createAsyncThunk(
         },
       };
 
-      await replaceDataInFirestore("users", "userId", userId, params);
+      await replaceDataInFirestore({
+        collectionName: "users",
+        fieldName: "userId",
+        value: userId,
+        data: params,
+      });
       if (hasPosts) {
-        await updateDataInFirestore(
-          "posts",
-          "author.id",
-          "author.photo",
-          userId,
-          url
-        );
+        await updateDataInFirestore({
+          collectionName: "posts",
+          fieldName: "author.id",
+          updateAt: "author.photo",
+          equalValue: userId,
+          value: url,
+        });
       }
       return params;
     } catch (error) {
@@ -126,7 +132,13 @@ export const updateLike = createAsyncThunk(
   "likes/updateLike",
   async ({ postId, newArrLikes }, { rejectWithValue }) => {
     try {
-      await updateDataInFirestore("posts", "id", "likes", postId, newArrLikes);
+      await updateDataInFirestore({
+        collectionName: "posts",
+        fieldName: "id",
+        updateAt: "likes",
+        equalValue: postId,
+        value: newArrLikes,
+      });
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.code);
@@ -164,8 +176,6 @@ export const createPostComment = createAsyncThunk(
   "posts/createPostComment",
   async ({ postId, commentData }, { rejectWithValue }) => {
     try {
-      commentData[0].commentId = `comment_${nanoid()}`;
-
       await updateDataInFirestore(
         "posts",
         "id",
@@ -173,6 +183,12 @@ export const createPostComment = createAsyncThunk(
         postId,
         commentData
       );
+      await fetchData({
+        collectionName: "posts",
+        type: "default",
+        fieldName: "id",
+        equalToFieldName: postId,
+      });
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.code);
@@ -204,11 +220,12 @@ export const createPost = createAsyncThunk(
 
       await writeDataToFirestore("posts", postData);
 
-      const postsData = await fetchData("posts");
+      const updatedData = await fetchData({
+        collectionName: "posts",
+        type: "default",
+      });
 
-      if (!postsData) return;
-
-      return postsData;
+      return updatedData.documents;
     } catch (error) {
       console.log(error);
       return rejectWithValue(error.code);

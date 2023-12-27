@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usersReducer } from "./slices/usersSlice";
 import { postsReducer } from "./slices/postSlice";
 import { likesReducer } from "./slices/likesSlice";
+import { commentsReducer } from "./slices/commentsSlice";
 
 const rootPersistConfig = {
   key: "root",
@@ -31,6 +32,7 @@ const rootReducer = combineReducers({
   user: persistReducer(userPersistConfig, usersReducer),
   posts: postsReducer,
   likes: likesReducer,
+  comments: commentsReducer,
 });
 
 const reducer = persistReducer(rootPersistConfig, rootReducer);

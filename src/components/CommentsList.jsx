@@ -22,7 +22,7 @@ export const CommentsList = ({ commentsData }) => {
             flexGrow: 1,
             flexDirection: "column-reverse",
           }}
-          keyExtractor={(item) => item.commentId}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View
               style={[

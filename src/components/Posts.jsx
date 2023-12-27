@@ -11,7 +11,7 @@ import { selectAuth } from "../redux/selectors/userSelectors";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { colors } from "../constants/colors";
 
-const Posts = ({ posts, loading, fetchMore }) => {
+const Posts = ({ posts, loading, fetchMore, likeHandler }) => {
   const { auth } = useSelector(selectAuth);
 
   // useEffect(() => {
@@ -38,13 +38,13 @@ const Posts = ({ posts, loading, fetchMore }) => {
 
   return (
     <>
-      {posts && posts?.length > 0 ? (
+      {posts && posts.length > 0 ? (
         <FlatList
           data={posts}
           showsVerticalScrollIndicator={false}
           keyExtractor={(item) => item.id}
           onEndReached={fetchMore}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.2}
           renderItem={({ item }) => {
             const {
               id,
@@ -75,7 +75,12 @@ const Posts = ({ posts, loading, fetchMore }) => {
                       postId={id}
                     />
                     {likes && (
-                      <LikeModule likes={likes} postId={id} userId={auth} />
+                      <LikeModule
+                        likes={likes}
+                        postId={id}
+                        userId={auth}
+                        likeHandler={likeHandler}
+                      />
                     )}
                   </View>
                   {location?.address && <LocationModule location={location} />}

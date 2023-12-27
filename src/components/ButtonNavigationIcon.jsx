@@ -23,10 +23,8 @@ export const ButtonNavigationIcon = ({
     if (type === "logOut") {
       dispatch(logOut());
       dispatch(cleanPosts());
-      return;
     } else if (type === "goBack") {
       navigation.goBack();
-      return;
     }
     navigation.navigate(navigateTo, { ...params });
   };

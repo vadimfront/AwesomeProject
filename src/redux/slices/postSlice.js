@@ -7,6 +7,7 @@ const initialState = {
   lastVisible: null,
   isLastPost: false,
   loading: false,
+  status: "idle",
   error: false,
 };
 
@@ -20,19 +21,39 @@ const postsSlice = createSlice({
       state.lastVisible = initialState.lastVisible;
       state.isLastPost = initialState.isLastPost;
     },
+    refreshStatus: (state) => {
+      state.status = initialState.status;
+    },
+    refreshPagination: (state) => {
+      state.lastVisible = initialState.lastVisible;
+      state.isLastPost = initialState.isLastPost;
+    },
+    updatePostsAfterLike: (state, { payload: { type, likes, postId } }) => {
+      if (type === "ownPosts") {
+        state.ownPosts.map((post) => {
+          if (post.id === postId) {
+            post.likes = likes;
+          }
+        });
+      } else {
+        state.posts.map((post) => {
+          if (post.id === postId) {
+            post.likes = likes;
+          }
+        });
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(createPost.pending, (state) => {
-      state.loading = true;
-      state.error = false;
+      state.status = "loading";
     });
     builder.addCase(createPost.fulfilled, (state, { payload }) => {
-      state.loading = false;
+      state.status = "succeeded";
       state.posts = payload;
-      state.isLastPost = false;
     });
     builder.addCase(createPost.rejected, (state, { payload }) => {
-      state.loading = false;
+      state.status = "failed";
     });
     /// Fetch posts
     builder.addCase(fatchPosts.pending, (state) => {
@@ -57,12 +78,14 @@ const postsSlice = createSlice({
     });
     builder.addCase(fatchMorePosts.fulfilled, (state, { payload }) => {
       state.lastVisible = payload.lastVisible;
-      state.isLastPost = payload.isLastPost;
       if (payload.type === "default" && payload.documents.length > 0) {
-        state.posts.push(...payload.documents);
+        state.posts = [...state.posts, ...payload.documents];
+        return;
       } else if (payload.type === "own" && payload.documents.length > 0) {
-        state.ownPosts.push(...payload.documents);
+        state.ownPosts = [...state.ownPosts, ...payload.documents];
+        return;
       }
+      state.isLastPost = payload.isLastPost;
     });
     builder.addCase(fatchMorePosts.rejected, (state, { payload }) => {
       state.error = payload;
@@ -71,4 +94,9 @@ const postsSlice = createSlice({
 });
 
 export const postsReducer = postsSlice.reducer;
-export const { cleanPosts, changeLikes } = postsSlice.actions;
+export const {
+  cleanPosts,
+  refreshStatus,
+  refreshPagination,
+  updatePostsAfterLike,
+} = postsSlice.actions;
