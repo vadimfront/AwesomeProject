@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { usePickImage } from "../hooks/usePickImage";
 import { fatchMorePosts, fatchPosts } from "../redux/operations";
 import {
-  cleanPosts,
   refreshPagination,
   updatePostsAfterLike,
 } from "../redux/slices/postSlice";
@@ -23,8 +22,7 @@ export const ProfileScreen = () => {
   const { pickImage, pickedImage, removePickedImage } = usePickImage();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(refreshPagination());
+  const fetchInitialPosts = () => {
     dispatch(
       fatchPosts({
         collectionName: "posts",
@@ -33,6 +31,11 @@ export const ProfileScreen = () => {
         equalToFieldName: auth,
       })
     );
+  };
+
+  useEffect(() => {
+    dispatch(refreshPagination());
+    fetchInitialPosts();
   }, [profile]);
 
   const fetchMoreHandler = () => {
@@ -80,6 +83,7 @@ export const ProfileScreen = () => {
           <Posts
             posts={ownPosts}
             loading={loading}
+            fetchInitialPosts={fetchInitialPosts}
             fetchMore={fetchMoreHandler}
             likeHandler={likeHandler}
           />

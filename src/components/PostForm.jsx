@@ -1,7 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Formik } from "formik";
 import * as Yup from "yup";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { colors } from "../constants/colors";
 import { ButtonCustom } from "./ButtonCustom";
@@ -10,12 +10,13 @@ import { InputCustom } from "./InputCustom";
 import { CameraComponent } from "./CameraComponent";
 import { useLocation } from "../hooks/useLocation";
 import { UploadImage } from "./UploadImage";
-import { useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { createPost } from "../redux/operations";
 import { selectAuth, selectPosts } from "../redux/selectors/userSelectors";
 import { getCurrentDateAndTime } from "../helpers/helpers";
-import { toastMessage } from "../helpers/toastMessage";
+import Spinner from "./Spinner";
+import { refreshStatus } from "../redux/slices/postSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const СreatePostSchema = Yup.object().shape({
   image: Yup.string().required("Ви не обрали зображення"),
@@ -29,10 +30,9 @@ export const PostForm = () => {
 
   const { profile, auth } = useSelector(selectAuth);
   const { status } = useSelector(selectPosts);
-
   const formikRef = useRef(null);
-
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const setSelectedImage = (img) => {
     setImage(img);
@@ -43,6 +43,20 @@ export const PostForm = () => {
     resetForm();
     setImage(null);
   };
+
+  useEffect(() => {
+    if (status === "succeeded") {
+      dispatch(refreshStatus());
+      navigation.navigate("PostsScreen");
+    } else if (status === "failed") {
+      toastMessage(
+        "error",
+        "Opps...",
+        "Something went wrong! Please try again."
+      );
+      dispatch(refreshStatus());
+    }
+  }, [dispatch, status]);
 
   const handleCreatePost = async (data) => {
     const { image, postTitle, location } = data;
@@ -160,7 +174,7 @@ export const PostForm = () => {
                 >
                   Опубліковати
                 </ButtonCustom>
-                {status === "loading" && <ActivityIndicator />}
+                {status === "loading" && <Spinner />}
               </View>
             </View>
             <View style={styles.trashBtnContainer}>

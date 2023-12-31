@@ -1,14 +1,29 @@
-import React from "react";
-import { StyleSheet } from "react-native";
+import React, { useEffect, useMemo } from "react";
+import { RefreshControl, StyleSheet } from "react-native";
 import { Image, Text, View } from "react-native";
 import { colors } from "../constants/colors";
 import { fonts } from "../constants/fonts";
 import { FlatList } from "react-native";
-import { selectAuth } from "../redux/selectors/userSelectors";
-import { useSelector } from "react-redux";
+import {
+  selectAuth,
+  selectComments,
+  selectUsers,
+} from "../redux/selectors/userSelectors";
+import { useDispatch, useSelector } from "react-redux";
+import Spinner from "./Spinner";
+import { fatchAllUsers } from "../redux/operations";
 
-export const CommentsList = ({ commentsData }) => {
+export const CommentsList = ({ commentsData, fetchComments }) => {
   const { auth } = useSelector(selectAuth);
+  const { loading, status } = useSelector(selectComments);
+  const { users } = useSelector(selectUsers);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fatchAllUsers({ collectionName: "users" }));
+  }, [dispatch]);
+
+  const memoizedUsers = useMemo(() => users, [users]);
 
   return (
     <>
@@ -23,24 +38,36 @@ export const CommentsList = ({ commentsData }) => {
             flexDirection: "column-reverse",
           }}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View
-              style={[
-                styles.comment,
-                item.userId === auth && styles.commentReverse,
-              ]}
-            >
-              <Image style={styles.avatar} src={item.userProfileImage.url} />
-              <View style={styles.commentTextWrap}>
-                <Text style={styles.commentText}>{item.comment}</Text>
-                <Text style={styles.commentDate}>{item.date}</Text>
+          refreshControl={
+            <RefreshControl refreshing={loading} onRefresh={fetchComments} />
+          }
+          renderItem={({ item }) => {
+            const index = memoizedUsers.findIndex(
+              (user) => user.userId === auth
+            );
+            return (
+              <View
+                style={[
+                  styles.comment,
+                  item.userId === auth && styles.commentReverse,
+                ]}
+              >
+                <Image
+                  style={styles.avatar}
+                  src={users[index].userProfileImage.url}
+                />
+                <View style={styles.commentTextWrap}>
+                  <Text style={styles.commentText}>{item.comment}</Text>
+                  <Text style={styles.commentDate}>{item.date}</Text>
+                </View>
               </View>
-            </View>
-          )}
+            );
+          }}
         />
       ) : (
         <Text style={styles.message}>There is no comments to read</Text>
       )}
+      {status === "loading" && <Spinner />}
     </>
   );
 };

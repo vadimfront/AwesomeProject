@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import UserProfile from "../components/UserProfile";
 import Posts from "../components/Posts";
-import { StyleSheet, View } from "react-native";
+import { Alert, BackHandler, StyleSheet, View } from "react-native";
 import { selectPosts } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -9,21 +9,32 @@ import { fatchMorePosts, fatchPosts } from "../redux/operations";
 import {
   cleanPosts,
   refreshPagination,
+  refreshStatus,
   updatePostsAfterLike,
 } from "../redux/slices/postSlice";
+import { logOut } from "../redux/slices/authSlice";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 export const PostsScreen = () => {
   const dispatch = useDispatch();
   const { posts, lastVisible, isLastPost, loading } = useSelector(selectPosts);
 
-  useEffect(() => {
-    //dispatch(refreshPagination());
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  const fetchInitialPosts = () => {
+    dispatch(refreshPagination());
     dispatch(
       fatchPosts({
         collectionName: "posts",
         type: "default",
       })
     );
+  };
+
+  useEffect(() => {
+    dispatch(refreshPagination());
+    fetchInitialPosts();
   }, []);
 
   const fetchMoreHandler = () => {
@@ -53,7 +64,7 @@ export const PostsScreen = () => {
       <UserProfile />
       <Posts
         posts={posts}
-        loading={loading}
+        fetchInitialPosts={fetchInitialPosts}
         fetchMore={fetchMoreHandler}
         likeHandler={likeHandler}
       />

@@ -6,7 +6,7 @@ import { CreatePostsScreen } from "../screens/CreatePostsScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import { ButtonNavigationIcon } from "../components/ButtonNavigationIcon";
 import { colors } from "../constants/colors";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 const TabsRouter = () => {
   const Tabs = createBottomTabNavigator();
@@ -43,7 +43,7 @@ const TabsRouter = () => {
         name="PostsScreen"
         component={PostsScreen}
         options={{
-          title: "Публікації",
+          title: "Posts",
           headerTitleAlign: "center",
           headerRightContainerStyle: {
             paddingRight: 16,
@@ -67,8 +67,8 @@ const TabsRouter = () => {
       <Tabs.Screen
         name="CreatePostsScreen"
         component={CreatePostsScreen}
-        options={{
-          title: "Створити публікацію",
+        options={({ navigation }) => ({
+          title: "Create post",
           headerTitleAlign: "center",
           headerStyle: {
             shadowColor: "#000",
@@ -86,7 +86,7 @@ const TabsRouter = () => {
           },
           tabBarStyle: { display: "none" },
           unmountOnBlur: true,
-        }}
+        })}
       />
       <Tabs.Screen
         name="ProfileScreen"

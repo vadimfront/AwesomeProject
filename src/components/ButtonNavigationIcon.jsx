@@ -3,7 +3,7 @@ import { Feather } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
-import { logOut } from "../redux/slices/usersSlice";
+import { logOut } from "../redux/slices/authSlice";
 import { cleanPosts } from "../redux/slices/postSlice";
 
 export const ButtonNavigationIcon = ({
@@ -23,8 +23,6 @@ export const ButtonNavigationIcon = ({
     if (type === "logOut") {
       dispatch(logOut());
       dispatch(cleanPosts());
-    } else if (type === "goBack") {
-      navigation.goBack();
     }
     navigation.navigate(navigateTo, { ...params });
   };

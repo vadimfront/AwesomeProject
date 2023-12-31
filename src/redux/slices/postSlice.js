@@ -7,6 +7,7 @@ const initialState = {
   lastVisible: null,
   isLastPost: false,
   loading: false,
+  loadingMore: false,
   status: "idle",
   error: false,
 };
@@ -43,6 +44,11 @@ const postsSlice = createSlice({
         });
       }
     },
+    updateCommentsInPost: (state, { payload: { postId, newComments } }) => {
+      const index = state.posts.findIndex((post) => post.id === postId);
+      if (index === -1) return;
+      state.posts[index].comments = newComments;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(createPost.pending, (state) => {
@@ -74,10 +80,12 @@ const postsSlice = createSlice({
     });
     /// Fetch more
     builder.addCase(fatchMorePosts.pending, (state) => {
+      state.loadingMore = true;
       state.error = false;
     });
     builder.addCase(fatchMorePosts.fulfilled, (state, { payload }) => {
       state.lastVisible = payload.lastVisible;
+      state.loadingMore = false;
       if (payload.type === "default" && payload.documents.length > 0) {
         state.posts = [...state.posts, ...payload.documents];
         return;
@@ -89,6 +97,7 @@ const postsSlice = createSlice({
     });
     builder.addCase(fatchMorePosts.rejected, (state, { payload }) => {
       state.error = payload;
+      state.loadingMore = false;
     });
   },
 });
@@ -99,4 +108,5 @@ export const {
   refreshStatus,
   refreshPagination,
   updatePostsAfterLike,
+  updateCommentsInPost,
 } = postsSlice.actions;

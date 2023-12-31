@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ButtonIcon } from "./ButtonIcon";
 import { colors } from "../constants/colors";
 import { StyleSheet, Text } from "react-native";

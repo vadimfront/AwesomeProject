@@ -14,7 +14,7 @@ import { selectAuth } from "../redux/selectors/userSelectors";
 import { useEffect } from "react";
 import { toastMessage } from "../helpers/toastMessage";
 import { useRef } from "react";
-import { resetError } from "../redux/slices/usersSlice";
+import { resetError } from "../redux/slices/authSlice";
 import { LoadingSpinner } from "./LoadingSpinner";
 
 export const LoginForm = () => {

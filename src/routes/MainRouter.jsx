@@ -8,14 +8,19 @@ import { colors } from "../constants/colors";
 import TabsRouter from "./TabsRouter";
 import { CommentsScreen } from "../screens/CommentsScreen";
 import { MapScreen } from "../screens/MapScreen";
+import { TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
+import { selectAuth } from "../redux/selectors/userSelectors";
+import { useSelector } from "react-redux";
 
 const MainRouter = () => {
   const MainStack = createStackNavigator();
+  const { auth } = useSelector(selectAuth);
 
   return (
     <NavigationContainer>
       <MainStack.Navigator
-        initialRouteName="Login"
+        initialRouteName={auth ? `Home` : "Login"}
         screenOptions={{ gestureEnabled: false }}
       >
         <MainStack.Screen
@@ -38,20 +43,19 @@ const MainRouter = () => {
         <MainStack.Screen
           name="Comments"
           component={CommentsScreen}
-          options={{
+          options={({ navigation }) => ({
             headerLeft: () => (
-              <ButtonNavigationIcon
-                iconName="arrow-left"
-                color={colors.iconColor}
-                type="goBack"
-              />
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Feather name="arrow-left" size={24} color={colors.iconColor} />
+              </TouchableOpacity>
             ),
-            headerTitle: "Коментарі",
+            headerTitle: "Comments",
+
             headerLeftContainerStyle: {
               paddingLeft: 16,
             },
             headerTitleAlign: "center",
-          }}
+          })}
         />
         <MainStack.Screen
           name="Map"
@@ -64,7 +68,7 @@ const MainRouter = () => {
                 navigateTo="ProfileScreen"
               />
             ),
-            headerTitle: "Карта",
+            headerTitle: "Map",
             headerLeftContainerStyle: {
               paddingLeft: 16,
             },

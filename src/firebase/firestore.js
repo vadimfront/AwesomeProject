@@ -16,7 +16,6 @@ import { db } from "./config";
 import { DATA_LIMIT } from "../constants/constants";
 
 export const writeDataToFirestore = async (dbName, data) => {
-  console.log(data);
   try {
     const docRef = await addDoc(collection(db, dbName), data);
 
@@ -76,30 +75,30 @@ export const updateDataInFirestore = async ({
 
     querySnapshot.forEach((docSnapshot) => {
       const docRef = doc(db, collectionName, docSnapshot.id);
+
       batch.update(docRef, { [updateAt]: value });
     });
 
     await batch.commit();
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
 
-export const fetchSingleFirestore = async (
+export const fetchSingleFirestore = async ({
   collectionName,
   fieldName,
-  value
-) => {
+  equalValue,
+}) => {
   try {
-    const q = query(
-      collection(db, collectionName),
-      where(fieldName, "==", value)
-    );
+    const whereProps =
+      fieldName && equalValue ? [where(fieldName, "==", equalValue)] : [];
+
+    const q = query(collection(db, collectionName), ...whereProps);
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.size) return;
 
-    return querySnapshot.docs[0].data();
+    return querySnapshot.docs.map((doc) => doc.data());
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;
@@ -142,7 +141,6 @@ export const fetchData = async ({
       type: type,
     };
   } catch (error) {
-    console.log(error.message);
     throw error;
   }
 };
@@ -187,15 +185,14 @@ export const fetchMoreData = async ({
     };
     return data;
   } catch (error) {
-    console.log(error.message);
     throw error;
   }
 };
 
-export const fetchAllDataFirestore = async (collectionName, dataLimit = 2) => {
+export const fetchAllDataFirestore = async (collectionName) => {
   try {
     const collectionRef = collection(db, collectionName);
-    const q = query(collectionRef, orderBy("date", "desc"), limit(dataLimit));
+    const q = query(collectionRef);
     const querySnapshot = await getDocs(q);
     if (!querySnapshot.size) return;
 

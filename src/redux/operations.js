@@ -60,7 +60,11 @@ export const login = createAsyncThunk(
 
       if (!userId) return;
 
-      const userData = await fetchSingleFirestore("users", "userId", userId);
+      const userData = await fetchSingleFirestore({
+        collectionName: "users",
+        fieldName: "userId",
+        equalValue: userId,
+      });
       if (!userData) return;
 
       const newData = {
@@ -80,7 +84,6 @@ export const login = createAsyncThunk(
 export const updateProfileImage = createAsyncThunk(
   "users/update",
   async (data, { rejectWithValue }) => {
-    console.log("data", data);
     try {
       if (!data) throw new Error("data is undefined");
       const {
@@ -122,7 +125,6 @@ export const updateProfileImage = createAsyncThunk(
       }
       return params;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -140,7 +142,6 @@ export const updateLike = createAsyncThunk(
         value: newArrLikes,
       });
     } catch (error) {
-      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -153,7 +154,18 @@ export const fatchPosts = createAsyncThunk(
       const response = await fetchData(params);
       return response;
     } catch (error) {
-      console.log(error);
+      return rejectWithValue(error.code);
+    }
+  }
+);
+
+export const fatchAllUsers = createAsyncThunk(
+  "users/fatchAllUsers",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await fetchSingleFirestore(params);
+      return response;
+    } catch (error) {
       return rejectWithValue(error.code);
     }
   }
@@ -166,31 +178,42 @@ export const fatchMorePosts = createAsyncThunk(
       const response = await fetchMoreData(params);
       return response;
     } catch (error) {
-      console.log(error);
+      return rejectWithValue(error.code);
+    }
+  }
+);
+
+export const fatchComments = createAsyncThunk(
+  "comments/fatchComments",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await fetchData(params);
+      return response.documents[0]?.comments;
+    } catch (error) {
       return rejectWithValue(error.code);
     }
   }
 );
 
 export const createPostComment = createAsyncThunk(
-  "posts/createPostComment",
+  "comments/createPostComment",
   async ({ postId, commentData }, { rejectWithValue }) => {
     try {
-      await updateDataInFirestore(
-        "posts",
-        "id",
-        "comments",
-        postId,
-        commentData
-      );
-      await fetchData({
+      await updateDataInFirestore({
+        collectionName: "posts",
+        fieldName: "id",
+        updateAt: "comments",
+        equalValue: postId,
+        value: commentData,
+      });
+      const response = await fetchData({
         collectionName: "posts",
         type: "default",
         fieldName: "id",
         equalToFieldName: postId,
       });
+      return response.documents[0]?.comments;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(error.code);
     }
   }
@@ -199,7 +222,6 @@ export const createPostComment = createAsyncThunk(
 export const createPost = createAsyncThunk(
   "posts/createPost",
   async (data, { rejectWithValue }) => {
-    console.log("data", data);
     try {
       const imageParams = {
         imageId: nanoid(),
@@ -227,32 +249,7 @@ export const createPost = createAsyncThunk(
 
       return updatedData.documents;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(error.code);
     }
   }
 );
-
-// export const updatePostsAuhtor = createAsyncThunk(
-//   "posts/updatePostsAuthor",
-//   async ({ updatedData, userId }, { rejectWithValue }) => {
-//     try {
-//       // collectionName,
-//       // fieldName,
-//       // updateAt,
-//       // equalValue,
-//       // value
-
-//       await updateDataInFirestore(
-//         "posts",
-//         "author.id",
-//         "photo",
-//         userId,
-//         updatedData
-//       );
-//     } catch (error) {
-//       console.log("errorrrr", error);
-//       return rejectWithValue(error.code);
-//     }
-//   }
-// );

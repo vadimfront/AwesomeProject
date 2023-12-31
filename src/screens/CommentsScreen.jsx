@@ -6,12 +6,13 @@ import { CommentsList } from "../components/CommentsList";
 import { CommentForm } from "../components/CommentForm";
 
 import KeyboardAvoidingContainer from "../components/KeyboardAvoidingContainer";
-import {
-  selectCommentsStatus,
-  selectPosts,
-} from "../redux/selectors/userSelectors";
+import { selectComments, selectPosts } from "../redux/selectors/userSelectors";
 import { useDispatch, useSelector } from "react-redux";
-import { fatchPosts } from "../redux/operations";
+import { fatchComments } from "../redux/operations";
+
+import { LoadingSpinner } from "../components/LoadingSpinner";
+import { colors } from "../constants/colors";
+import { updateCommentsInPost } from "../redux/slices/postSlice";
 
 export const CommentsScreen = () => {
   const {
@@ -19,11 +20,31 @@ export const CommentsScreen = () => {
   } = useRoute();
 
   const { posts, ownPosts } = useSelector(selectPosts);
+  const { comments, loading } = useSelector(selectComments);
 
   const [fixed, setFixed] = useState(false);
   const dispatch = useDispatch();
 
-  const postsData = posts.length ? posts : ownPosts;
+  const fetchComments = () => {
+    dispatch(
+      fatchComments({
+        collectionName: "posts",
+        type: "own",
+        fieldName: "id",
+        equalToFieldName: postId,
+      })
+    );
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  useEffect(() => {
+    dispatch(updateCommentsInPost({ postId, newComments: comments }));
+  }, [comments]);
+
+  //const postsData = posts.length ? posts : ownPosts;
 
   // useEffect(() => {
   //   dispatch(
@@ -61,27 +82,34 @@ export const CommentsScreen = () => {
   };
 
   const imageStyle = fixed ? styles.fixedPostImg : styles.postImg;
-
+  const postsData = posts.length ? posts : ownPosts;
   const index = postsData.findIndex((post) => post.id === postId);
-  const commentsData = postsData[index]?.comments;
+  // const commentsData = postsData[index]?.comments;
 
   return (
-    <KeyboardAvoidingContainer
-      offsetAndroid={90}
-      offsetIos={90}
-      keyboardDismissOff={true}
-    >
-      <View style={styles.container}>
-        <Animated.Image
-          src={postsData[index]?.postImage}
-          style={[imageStyle, { opacity: fadeAnim }]}
-        />
+    <>
+      <KeyboardAvoidingContainer
+        offsetAndroid={90}
+        offsetIos={90}
+        keyboardDismissOff={true}
+      >
+        <View style={styles.container}>
+          <Animated.Image
+            src={postsData[index]?.postImage}
+            style={[imageStyle, { opacity: fadeAnim }]}
+          />
 
-        <CommentsList commentsData={commentsData} />
+          <CommentsList commentsData={comments} fetchComments={fetchComments} />
 
-        <CommentForm postId={postId} handlerFocus={handlerFocus} />
-      </View>
-    </KeyboardAvoidingContainer>
+          <CommentForm postId={postId} handlerFocus={handlerFocus} />
+        </View>
+      </KeyboardAvoidingContainer>
+      <LoadingSpinner
+        loading={loading}
+        overlayColor={colors.btnBgColor}
+        text="Загрузка..."
+      />
+    </>
   );
 };
 

@@ -11,10 +11,11 @@ import {
 } from "redux-persist";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { usersReducer } from "./slices/usersSlice";
 import { postsReducer } from "./slices/postSlice";
 import { likesReducer } from "./slices/likesSlice";
 import { commentsReducer } from "./slices/commentsSlice";
+import { authReducer } from "./slices/authSlice";
+import { usersReducer } from "./slices/usersSlice";
 
 const rootPersistConfig = {
   key: "root",
@@ -23,13 +24,14 @@ const rootPersistConfig = {
 };
 
 const userPersistConfig = {
-  key: "user",
+  key: "auth",
   storage: AsyncStorage,
   whitelist: ["auth", "profile"],
 };
 
 const rootReducer = combineReducers({
-  user: persistReducer(userPersistConfig, usersReducer),
+  auth: persistReducer(userPersistConfig, authReducer),
+  users: usersReducer,
   posts: postsReducer,
   likes: likesReducer,
   comments: commentsReducer,
@@ -48,14 +50,5 @@ const store = configureStore({
 });
 
 const persistor = persistStore(store);
-
-// AsyncStorage.getItem("posts", (err, result) => {
-//   if (!err) {
-//     const userData = JSON.parse(result);
-//     console.log("User Data:", userData);
-//   } else {
-//     console.error("Error reading user data from AsyncStorage:", err);
-//   }
-// });
 
 export default { store, persistor };

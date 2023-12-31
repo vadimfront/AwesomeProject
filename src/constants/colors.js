@@ -15,4 +15,5 @@ export const colors = {
   commentsMessage: "rgba(0, 0, 0, 0.03)",
   createPostDefault: "#F6F6F6",
   overlayColor: "rgba(57,49,49, 0.8)",
+  spinnerColor: "#FF6C00",
 };

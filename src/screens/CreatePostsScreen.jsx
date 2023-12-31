@@ -13,24 +13,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { refreshStatus } from "../redux/slices/postSlice";
 
 export const CreatePostsScreen = () => {
-  const { status } = useSelector(selectPosts);
-  const navigation = useNavigation();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    if (status === "succeeded") {
-      dispatch(refreshStatus());
-      navigation.navigate("PostsScreen");
-    } else if (status === "failed") {
-      toastMessage(
-        "error",
-        "Opps...",
-        "Something went wrong! Please try again."
-      );
-      dispatch(refreshStatus());
-    }
-  }, [status]);
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, flexDirection: "column", justifyContent: "center" }}
